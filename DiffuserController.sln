@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36717.8 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiffuserController", "DiffuserController\DiffuserController.csproj", "{1A7CBF6B-55E5-4289-804F-898E51E91378}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1A7CBF6B-55E5-4289-804F-898E51E91378}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A7CBF6B-55E5-4289-804F-898E51E91378}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A7CBF6B-55E5-4289-804F-898E51E91378}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A7CBF6B-55E5-4289-804F-898E51E91378}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9AB99397-0B85-4B51-BCAD-E9558A3678C1}
+	EndGlobalSection
+EndGlobal
