@@ -29,10 +29,10 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            DataGridViewCellStyle dataGridViewCellStyle9 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle10 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle11 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle12 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
             tabControl1 = new TabControl();
             tabPage2 = new TabPage();
             grid = new DataGridView();
@@ -44,19 +44,25 @@
             dataGridViewTextBoxColumn1 = new DataGridViewTextBoxColumn();
             messageDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
             dateModelBindingSource = new BindingSource(components);
-            flowLayoutPanel1 = new FlowLayoutPanel();
-            btnCheckHoliDay = new Button();
-            btnCheckSat = new Button();
+            panel3 = new Panel();
             btnSelectedDel = new Button();
             panel2 = new Panel();
-            btnDel = new Button();
-            btnRange = new Button();
-            btnApply = new Button();
-            label12 = new Label();
-            txtMessage = new TextBox();
-            label11 = new Label();
-            txtDt = new TextBox();
+            groupBox2 = new GroupBox();
+            defYear = new NumericUpDown();
+            label13 = new Label();
+            btnSunday = new Button();
+            btnSatDay = new Button();
+            btnHoliDay = new Button();
+            label14 = new Label();
+            groupBox1 = new GroupBox();
             monthCalendar1 = new MonthCalendar();
+            label11 = new Label();
+            btnDel = new Button();
+            txtDt = new TextBox();
+            btnRange = new Button();
+            txtMessage = new TextBox();
+            label12 = new Label();
+            btnApply = new Button();
             tabPage1 = new TabPage();
             button2 = new Button();
             button1 = new Button();
@@ -84,8 +90,11 @@
             tabPage2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)grid).BeginInit();
             ((System.ComponentModel.ISupportInitialize)dateModelBindingSource).BeginInit();
-            flowLayoutPanel1.SuspendLayout();
+            panel3.SuspendLayout();
             panel2.SuspendLayout();
+            groupBox2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)defYear).BeginInit();
+            groupBox1.SuspendLayout();
             tabPage1.SuspendLayout();
             panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numericUpDown4).BeginInit();
@@ -104,18 +113,18 @@
             tabControl1.Location = new Point(0, 0);
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
-            tabControl1.Size = new Size(718, 400);
+            tabControl1.Size = new Size(646, 567);
             tabControl1.TabIndex = 0;
             // 
             // tabPage2
             // 
             tabPage2.Controls.Add(grid);
-            tabPage2.Controls.Add(flowLayoutPanel1);
+            tabPage2.Controls.Add(panel3);
             tabPage2.Controls.Add(panel2);
             tabPage2.Location = new Point(4, 24);
             tabPage2.Name = "tabPage2";
             tabPage2.Padding = new Padding(3);
-            tabPage2.Size = new Size(710, 372);
+            tabPage2.Size = new Size(638, 539);
             tabPage2.TabIndex = 1;
             tabPage2.Text = "스케줄링 표";
             tabPage2.UseVisualStyleBackColor = true;
@@ -131,11 +140,11 @@
             grid.Columns.AddRange(new DataGridViewColumn[] { Column1, dateDataGridViewTextBoxColumn, yearDataGridViewTextBoxColumn, monthDataGridViewTextBoxColumn, dayDataGridViewTextBoxColumn, dataGridViewTextBoxColumn1, messageDataGridViewTextBoxColumn });
             grid.DataSource = dateModelBindingSource;
             grid.Dock = DockStyle.Fill;
-            grid.Location = new Point(233, 53);
+            grid.Location = new Point(239, 35);
             grid.Name = "grid";
             grid.RowHeadersVisible = false;
             grid.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            grid.Size = new Size(474, 316);
+            grid.Size = new Size(396, 501);
             grid.TabIndex = 2;
             // 
             // Column1
@@ -157,41 +166,37 @@
             // yearDataGridViewTextBoxColumn
             // 
             yearDataGridViewTextBoxColumn.DataPropertyName = "year";
-            dataGridViewCellStyle9.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            yearDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle9;
+            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            yearDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle1;
             yearDataGridViewTextBoxColumn.HeaderText = "년";
             yearDataGridViewTextBoxColumn.Name = "yearDataGridViewTextBoxColumn";
-            yearDataGridViewTextBoxColumn.ReadOnly = true;
             yearDataGridViewTextBoxColumn.Width = 60;
             // 
             // monthDataGridViewTextBoxColumn
             // 
             monthDataGridViewTextBoxColumn.DataPropertyName = "month";
-            dataGridViewCellStyle10.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            monthDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle10;
+            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            monthDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle2;
             monthDataGridViewTextBoxColumn.HeaderText = "월";
             monthDataGridViewTextBoxColumn.Name = "monthDataGridViewTextBoxColumn";
-            monthDataGridViewTextBoxColumn.ReadOnly = true;
             monthDataGridViewTextBoxColumn.Width = 40;
             // 
             // dayDataGridViewTextBoxColumn
             // 
             dayDataGridViewTextBoxColumn.DataPropertyName = "day";
-            dataGridViewCellStyle11.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dayDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle11;
+            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dayDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle3;
             dayDataGridViewTextBoxColumn.HeaderText = "일";
             dayDataGridViewTextBoxColumn.Name = "dayDataGridViewTextBoxColumn";
-            dayDataGridViewTextBoxColumn.ReadOnly = true;
             dayDataGridViewTextBoxColumn.Width = 40;
             // 
             // dataGridViewTextBoxColumn1
             // 
             dataGridViewTextBoxColumn1.DataPropertyName = "DoW";
-            dataGridViewCellStyle12.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewTextBoxColumn1.DefaultCellStyle = dataGridViewCellStyle12;
+            dataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewTextBoxColumn1.DefaultCellStyle = dataGridViewCellStyle4;
             dataGridViewTextBoxColumn1.HeaderText = "요일";
             dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
-            dataGridViewTextBoxColumn1.ReadOnly = true;
             dataGridViewTextBoxColumn1.Width = 40;
             // 
             // messageDataGridViewTextBoxColumn
@@ -205,41 +210,18 @@
             // 
             dateModelBindingSource.DataSource = typeof(DateModel);
             // 
-            // flowLayoutPanel1
+            // panel3
             // 
-            flowLayoutPanel1.Controls.Add(btnCheckHoliDay);
-            flowLayoutPanel1.Controls.Add(btnCheckSat);
-            flowLayoutPanel1.Controls.Add(btnSelectedDel);
-            flowLayoutPanel1.Dock = DockStyle.Top;
-            flowLayoutPanel1.Location = new Point(233, 3);
-            flowLayoutPanel1.Name = "flowLayoutPanel1";
-            flowLayoutPanel1.Padding = new Padding(0, 10, 0, 0);
-            flowLayoutPanel1.Size = new Size(474, 50);
-            flowLayoutPanel1.TabIndex = 0;
-            // 
-            // btnCheckHoliDay
-            // 
-            btnCheckHoliDay.Location = new Point(3, 13);
-            btnCheckHoliDay.Name = "btnCheckHoliDay";
-            btnCheckHoliDay.Size = new Size(90, 23);
-            btnCheckHoliDay.TabIndex = 0;
-            btnCheckHoliDay.Text = "공휴일 반영";
-            btnCheckHoliDay.UseVisualStyleBackColor = true;
-            btnCheckHoliDay.Click += btnCheckHoliDay_Click;
-            // 
-            // btnCheckSat
-            // 
-            btnCheckSat.Location = new Point(99, 13);
-            btnCheckSat.Name = "btnCheckSat";
-            btnCheckSat.Size = new Size(86, 23);
-            btnCheckSat.TabIndex = 1;
-            btnCheckSat.Text = "토요일 반영";
-            btnCheckSat.UseVisualStyleBackColor = true;
-            btnCheckSat.Click += btnCheckSat_Click;
+            panel3.Controls.Add(btnSelectedDel);
+            panel3.Dock = DockStyle.Top;
+            panel3.Location = new Point(239, 3);
+            panel3.Name = "panel3";
+            panel3.Size = new Size(396, 32);
+            panel3.TabIndex = 4;
             // 
             // btnSelectedDel
             // 
-            btnSelectedDel.Location = new Point(191, 13);
+            btnSelectedDel.Location = new Point(1, 5);
             btnSelectedDel.Name = "btnSelectedDel";
             btnSelectedDel.Size = new Size(105, 23);
             btnSelectedDel.TabIndex = 2;
@@ -249,24 +231,130 @@
             // 
             // panel2
             // 
-            panel2.Controls.Add(btnDel);
-            panel2.Controls.Add(btnRange);
-            panel2.Controls.Add(btnApply);
-            panel2.Controls.Add(label12);
-            panel2.Controls.Add(txtMessage);
-            panel2.Controls.Add(label11);
-            panel2.Controls.Add(txtDt);
-            panel2.Controls.Add(monthCalendar1);
+            panel2.Controls.Add(groupBox2);
+            panel2.Controls.Add(label14);
+            panel2.Controls.Add(groupBox1);
             panel2.Dock = DockStyle.Left;
             panel2.Location = new Point(3, 3);
             panel2.Name = "panel2";
-            panel2.Size = new Size(230, 366);
+            panel2.Padding = new Padding(5);
+            panel2.Size = new Size(236, 533);
             panel2.TabIndex = 1;
             panel2.Paint += panel2_Paint;
             // 
+            // groupBox2
+            // 
+            groupBox2.Controls.Add(defYear);
+            groupBox2.Controls.Add(label13);
+            groupBox2.Controls.Add(btnSunday);
+            groupBox2.Controls.Add(btnSatDay);
+            groupBox2.Controls.Add(btnHoliDay);
+            groupBox2.Dock = DockStyle.Top;
+            groupBox2.Location = new Point(5, 385);
+            groupBox2.Name = "groupBox2";
+            groupBox2.Size = new Size(226, 143);
+            groupBox2.TabIndex = 9;
+            groupBox2.TabStop = false;
+            groupBox2.Text = " 일괄 저장 처리 ";
+            // 
+            // defYear
+            // 
+            defYear.Location = new Point(73, 21);
+            defYear.Maximum = new decimal(new int[] { 2100, 0, 0, 0 });
+            defYear.Minimum = new decimal(new int[] { 2026, 0, 0, 0 });
+            defYear.Name = "defYear";
+            defYear.Size = new Size(55, 23);
+            defYear.TabIndex = 2;
+            defYear.TextAlign = HorizontalAlignment.Center;
+            defYear.Value = new decimal(new int[] { 2026, 0, 0, 0 });
+            // 
+            // label13
+            // 
+            label13.Location = new Point(7, 25);
+            label13.Name = "label13";
+            label13.Size = new Size(74, 15);
+            label13.TabIndex = 0;
+            label13.Text = "기준년도: ";
+            label13.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // btnSunday
+            // 
+            btnSunday.Location = new Point(14, 51);
+            btnSunday.Name = "btnSunday";
+            btnSunday.Size = new Size(90, 23);
+            btnSunday.TabIndex = 1;
+            btnSunday.Text = "일요일 반영";
+            btnSunday.UseVisualStyleBackColor = true;
+            btnSunday.Click += btnSunday_Click;
+            // 
+            // btnSatDay
+            // 
+            btnSatDay.Location = new Point(123, 51);
+            btnSatDay.Name = "btnSatDay";
+            btnSatDay.Size = new Size(90, 23);
+            btnSatDay.TabIndex = 1;
+            btnSatDay.Text = "토요일 반영";
+            btnSatDay.UseVisualStyleBackColor = true;
+            btnSatDay.Click += btnSatDay_Click;
+            // 
+            // btnHoliDay
+            // 
+            btnHoliDay.Location = new Point(15, 80);
+            btnHoliDay.Name = "btnHoliDay";
+            btnHoliDay.Size = new Size(90, 23);
+            btnHoliDay.TabIndex = 0;
+            btnHoliDay.Text = "공휴일 반영";
+            btnHoliDay.UseVisualStyleBackColor = true;
+            btnHoliDay.Click += btnHoliDay_Click;
+            // 
+            // label14
+            // 
+            label14.Dock = DockStyle.Top;
+            label14.Location = new Point(5, 370);
+            label14.Name = "label14";
+            label14.Size = new Size(226, 15);
+            label14.TabIndex = 0;
+            label14.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // groupBox1
+            // 
+            groupBox1.Controls.Add(monthCalendar1);
+            groupBox1.Controls.Add(label11);
+            groupBox1.Controls.Add(btnDel);
+            groupBox1.Controls.Add(txtDt);
+            groupBox1.Controls.Add(btnRange);
+            groupBox1.Controls.Add(txtMessage);
+            groupBox1.Controls.Add(label12);
+            groupBox1.Controls.Add(btnApply);
+            groupBox1.Dock = DockStyle.Top;
+            groupBox1.Location = new Point(5, 5);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Size = new Size(226, 365);
+            groupBox1.TabIndex = 8;
+            groupBox1.TabStop = false;
+            groupBox1.Text = " 개별 저장 처리 ";
+            // 
+            // monthCalendar1
+            // 
+            monthCalendar1.Dock = DockStyle.Top;
+            monthCalendar1.Location = new Point(3, 19);
+            monthCalendar1.MaxSelectionCount = 1;
+            monthCalendar1.Name = "monthCalendar1";
+            monthCalendar1.TabIndex = 1;
+            monthCalendar1.DateChanged += monthCalendar1_DateChanged;
+            // 
+            // label11
+            // 
+            label11.Location = new Point(6, 186);
+            label11.Name = "label11";
+            label11.Size = new Size(70, 23);
+            label11.TabIndex = 4;
+            label11.Text = "선택 날짜";
+            label11.TextAlign = ContentAlignment.MiddleLeft;
+            // 
             // btnDel
             // 
-            btnDel.Location = new Point(164, 330);
+            btnDel.Location = new Point(163, 336);
             btnDel.Name = "btnDel";
             btnDel.Size = new Size(60, 23);
             btnDel.TabIndex = 7;
@@ -274,9 +362,17 @@
             btnDel.UseVisualStyleBackColor = true;
             btnDel.Click += btnDel_Click;
             // 
+            // txtDt
+            // 
+            txtDt.Location = new Point(82, 186);
+            txtDt.Name = "txtDt";
+            txtDt.ReadOnly = true;
+            txtDt.Size = new Size(141, 23);
+            txtDt.TabIndex = 2;
+            // 
             // btnRange
             // 
-            btnRange.Location = new Point(6, 330);
+            btnRange.Location = new Point(3, 336);
             btnRange.Name = "btnRange";
             btnRange.Size = new Size(69, 23);
             btnRange.TabIndex = 7;
@@ -284,57 +380,32 @@
             btnRange.UseVisualStyleBackColor = true;
             btnRange.Click += btnRange_Click;
             // 
-            // btnApply
+            // txtMessage
             // 
-            btnApply.Location = new Point(98, 330);
-            btnApply.Name = "btnApply";
-            btnApply.Size = new Size(60, 23);
-            btnApply.TabIndex = 7;
-            btnApply.Text = "적용";
-            btnApply.UseVisualStyleBackColor = true;
-            btnApply.Click += btnApply_Click;
+            txtMessage.Location = new Point(82, 227);
+            txtMessage.Multiline = true;
+            txtMessage.Name = "txtMessage";
+            txtMessage.Size = new Size(141, 98);
+            txtMessage.TabIndex = 5;
             // 
             // label12
             // 
-            label12.Location = new Point(5, 221);
+            label12.Location = new Point(6, 227);
             label12.Name = "label12";
             label12.Size = new Size(70, 23);
             label12.TabIndex = 6;
             label12.Text = "내용";
             label12.TextAlign = ContentAlignment.MiddleLeft;
             // 
-            // txtMessage
+            // btnApply
             // 
-            txtMessage.Location = new Point(81, 221);
-            txtMessage.Multiline = true;
-            txtMessage.Name = "txtMessage";
-            txtMessage.Size = new Size(143, 98);
-            txtMessage.TabIndex = 5;
-            // 
-            // label11
-            // 
-            label11.Location = new Point(5, 180);
-            label11.Name = "label11";
-            label11.Size = new Size(70, 23);
-            label11.TabIndex = 4;
-            label11.Text = "선택 날짜";
-            label11.TextAlign = ContentAlignment.MiddleLeft;
-            // 
-            // txtDt
-            // 
-            txtDt.Location = new Point(81, 180);
-            txtDt.Name = "txtDt";
-            txtDt.ReadOnly = true;
-            txtDt.Size = new Size(143, 23);
-            txtDt.TabIndex = 2;
-            // 
-            // monthCalendar1
-            // 
-            monthCalendar1.Location = new Point(5, 6);
-            monthCalendar1.MaxSelectionCount = 1;
-            monthCalendar1.Name = "monthCalendar1";
-            monthCalendar1.TabIndex = 1;
-            monthCalendar1.DateChanged += monthCalendar1_DateChanged;
+            btnApply.Location = new Point(97, 336);
+            btnApply.Name = "btnApply";
+            btnApply.Size = new Size(60, 23);
+            btnApply.TabIndex = 7;
+            btnApply.Text = "적용";
+            btnApply.UseVisualStyleBackColor = true;
+            btnApply.Click += btnApply_Click;
             // 
             // tabPage1
             // 
@@ -359,14 +430,14 @@
             tabPage1.Location = new Point(4, 24);
             tabPage1.Name = "tabPage1";
             tabPage1.Padding = new Padding(3);
-            tabPage1.Size = new Size(710, 372);
+            tabPage1.Size = new Size(638, 539);
             tabPage1.TabIndex = 0;
             tabPage1.Text = "제어판";
             tabPage1.UseVisualStyleBackColor = true;
             // 
             // button2
             // 
-            button2.Location = new Point(282, 305);
+            button2.Location = new Point(307, 314);
             button2.Name = "button2";
             button2.Size = new Size(105, 42);
             button2.TabIndex = 4;
@@ -375,7 +446,7 @@
             // 
             // button1
             // 
-            button1.Location = new Point(154, 305);
+            button1.Location = new Point(179, 314);
             button1.Name = "button1";
             button1.Size = new Size(105, 42);
             button1.TabIndex = 4;
@@ -565,9 +636,9 @@
             // 
             // statusStrip1
             // 
-            statusStrip1.Location = new Point(0, 400);
+            statusStrip1.Location = new Point(0, 567);
             statusStrip1.Name = "statusStrip1";
-            statusStrip1.Size = new Size(718, 22);
+            statusStrip1.Size = new Size(646, 22);
             statusStrip1.TabIndex = 6;
             statusStrip1.Text = "statusStrip1";
             // 
@@ -575,19 +646,22 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(718, 422);
+            ClientSize = new Size(646, 589);
             Controls.Add(tabControl1);
             Controls.Add(statusStrip1);
-            MinimumSize = new Size(564, 461);
+            MinimumSize = new Size(662, 628);
             Name = "frmMain";
             Text = "Form1";
             tabControl1.ResumeLayout(false);
             tabPage2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)grid).EndInit();
             ((System.ComponentModel.ISupportInitialize)dateModelBindingSource).EndInit();
-            flowLayoutPanel1.ResumeLayout(false);
+            panel3.ResumeLayout(false);
             panel2.ResumeLayout(false);
-            panel2.PerformLayout();
+            groupBox2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)defYear).EndInit();
+            groupBox1.ResumeLayout(false);
+            groupBox1.PerformLayout();
             tabPage1.ResumeLayout(false);
             panel1.ResumeLayout(false);
             panel1.PerformLayout();
@@ -627,10 +701,8 @@
         private Label label9;
         private Label label8;
         private Label label7;
-        private FlowLayoutPanel flowLayoutPanel1;
         private StatusStrip statusStrip1;
-        private Button btnCheckHoliDay;
-        private Button btnCheckSat;
+        private Button btnHoliDay;
         private Button btnSelectedDel;
         private Panel panel2;
         private Button btnApply;
@@ -651,5 +723,13 @@
         private DataGridViewTextBoxColumn messageDataGridViewTextBoxColumn;
         private Button btnDel;
         private Button btnRange;
+        private Button btnSatDay;
+        private Panel panel3;
+        private Label label13;
+        private NumericUpDown defYear;
+        private GroupBox groupBox2;
+        private Button btnSunday;
+        private Label label14;
+        private GroupBox groupBox1;
     }
 }

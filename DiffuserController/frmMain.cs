@@ -1,5 +1,8 @@
 
+using System.Web;
 using System.Windows.Forms;
+using System.Xml.Serialization;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DiffuserController
 {
@@ -50,6 +53,28 @@ namespace DiffuserController
             grid.DefaultCellStyle.SelectionBackColor = Color.FromArgb(229, 243, 255);
             grid.DefaultCellStyle.SelectionForeColor = Color.FromArgb(30, 30, 30);
             SetupHeaderCheckBox();
+            grid.CellContentDoubleClick += Grid_CellContentDoubleClick;
+            grid.CellBeginEdit += Grid_CellBeginEdit;
+        }
+
+        private void Grid_CellBeginEdit(object? sender, DataGridViewCellCancelEventArgs e)
+        {
+            // 체크박스 컬럼이 아니면 편집 진입 차단
+            if (e.ColumnIndex != Column1.Index)
+            {
+                e.Cancel = true;
+            }
+        }
+
+        private void Grid_CellContentDoubleClick(object? sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0) return;  // 헤더 더블클릭 방지
+            
+            DateModel selectedModel = (DateModel)grid.Rows[e.RowIndex].DataBoundItem;
+            if (selectedModel != null)
+            {
+                monthCalendar1.SetDate(selectedModel.Date.ToDateTime(TimeOnly.MinValue));
+            }
         }
 
         private void SetupHeaderCheckBox()
@@ -164,32 +189,214 @@ namespace DiffuserController
 
         private void btnRange_Click(object sender, EventArgs e)
         {
+            if (string.IsNullOrEmpty(txtMessage.Text))
+            {
+                MessageBox.Show("스케줄링 제외 사유를 입력하세요");
+                return;
+            }
+            else
+            {
+                using (frmPopup frm = new frmPopup(monthCalendar1.SelectionStart))
+                {
+                    frm.StartPosition = FormStartPosition.CenterParent;
+                    if (frm.ShowDialog(this) == DialogResult.OK)
+                    {
+                        ContinueSave(monthCalendar1.SelectionStart, frm.EndDate, txtMessage.Text);
+                    }
+                }
+            }
+        }
 
+        private void ContinueSave(DateTime selectionStart, DateTime endDate, string text)
+        {
+            DateTime dt = selectionStart;
+            while (true)
+            {
+                if (dt.Date > endDate.Date)
+                    break;
+                var find = DateHelper.Instance.Dates.FirstOrDefault(x => x.Date == DateOnly.FromDateTime(dt.Date));
+                if (find != null)
+                {
+                    find.Message = text;
+                }
+                else
+                {
+                    DateModel dm = new DateModel();
+                    dm.Date = DateOnly.FromDateTime(dt);
+                    dm.Message = text;
+                    DateHelper.Instance.Dates.Add(dm);
+                }
+                dt = dt.AddDays(1);
+            }
+            DateHelper.Instance.Save();
         }
 
         private void btnApply_Click(object sender, EventArgs e)
         {
-
+            var find = DateHelper.Instance.Dates.FirstOrDefault(x => x.Date == DateOnly.FromDateTime(monthCalendar1.SelectionStart.Date));
+            if(find != null)
+            {
+                find.Message = txtMessage.Text;
+            }
+            else
+            {
+                DateModel dm = new DateModel();
+                dm.Date = DateOnly.FromDateTime(monthCalendar1.SelectionStart);
+                dm.Message = txtMessage.Text;
+                DateHelper.Instance.Dates.Add(dm);
+            }
+            DateHelper.Instance.Save();
         }
 
         private void btnDel_Click(object sender, EventArgs e)
         {
-
-        }
-
-        private void btnCheckHoliDay_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void btnCheckSat_Click(object sender, EventArgs e)
-        {
-
+            var find = DateHelper.Instance.Dates.FirstOrDefault(x => x.Date == DateOnly.FromDateTime(monthCalendar1.SelectionStart.Date));
+            if (find != null)
+            {
+                if (MessageBox.Show("선택된 일정을 삭제 하시겠습니가?", "", MessageBoxButtons.YesNo, MessageBoxIcon.Question)
+                    == DialogResult.Yes)
+                {
+                    DateHelper.Instance.Dates.Remove(find);
+                    DateHelper.Instance.Save();
+                    txtMessage.Text = "";
+                }
+            }
         }
 
         private void btnSelectedDel_Click(object sender, EventArgs e)
         {
+            List<DateModel> checkedItems = grid.Rows
+      .Cast<DataGridViewRow>()
+      .Where(r => Convert.ToBoolean(r.Cells[Column1.Index].Value))
+      .Select(r => (DateModel)r.DataBoundItem)
+      .ToList();
 
+            if (checkedItems.Count > 0)
+            {
+                if (MessageBox.Show("선택된 일정을 모두 삭제 하시겠습니가?", "", MessageBoxButtons.YesNo, MessageBoxIcon.Question)
+                    == DialogResult.Yes)
+                {
+                    foreach (var item in checkedItems)
+                    {
+                        DateHelper.Instance.Dates.Remove(item);
+                    }
+                    DateHelper.Instance.Save();
+                    txtMessage.Text = "";
+                }
+            }
+        }
+
+        private void btnSunday_Click(object sender, EventArgs e)
+        {
+            DateTime dt = new DateTime((int)defYear.Value, 1, 1);
+            while(true)
+            {
+                if(dt.DayOfWeek == DayOfWeek.Sunday)
+                {
+                    break;
+                }
+                dt = dt.AddDays(1);
+            }
+            while(true)
+            {
+                if(dt.Year> defYear.Value)
+                {
+                    break;
+                }
+                DateModel dm = new DateModel();
+                dm.Date = DateOnly.FromDateTime(dt);
+                dm.Message = "쉬는날 - 일요일";
+                var find = DateHelper.Instance.Dates.FirstOrDefault(x => x.Date == dm.Date);
+                if(find != null)
+                {
+                    find.Message = dm.Message;
+                }
+                else
+                {
+                    DateHelper.Instance.Dates.Add(dm);
+                }
+                dt = dt.AddDays(7);
+            }
+            DateHelper.Instance.Save();
+            
+        }
+
+        private void btnSatDay_Click(object sender, EventArgs e)
+        {
+            DateTime dt = new DateTime((int)defYear.Value, 1, 1);
+            while (true)
+            {
+                if (dt.DayOfWeek == DayOfWeek.Saturday)
+                {
+                    break;
+                }
+                dt = dt.AddDays(1);
+            }
+            while (true)
+            {
+                if (dt.Year > defYear.Value)
+                {
+                    break;
+                }
+                DateModel dm = new DateModel();
+                dm.Date = DateOnly.FromDateTime(dt);
+                dm.Message = "쉬는날 - 토요일";
+                var find = DateHelper.Instance.Dates.FirstOrDefault(x => x.Date == dm.Date);
+                if (find != null)
+                {
+                    find.Message = dm.Message;
+                }
+                else
+                {
+                    DateHelper.Instance.Dates.Add(dm);
+                }
+                dt = dt.AddDays(7);
+            }
+            DateHelper.Instance.Save();
+        }
+
+        private async void btnHoliDay_Click(object sender, EventArgs e)
+        {
+            var holidays = await HolidayApi.GetHolidaysAsync((int)defYear.Value);
+
+            foreach (var h in holidays)
+            {
+                DateModel dm = new DateModel();
+                dm.Date = h.Date;
+                dm.Message = h.DateName;
+                var find = DateHelper.Instance.Dates.FirstOrDefault(x => x.Date == dm.Date);
+                if (find != null)
+                {
+                    find.Message = dm.Message;
+                }
+                else
+                {
+                    DateHelper.Instance.Dates.Add(dm);
+                }
+            }
+
+            DateHelper.Instance.Save();
+        }
+    }
+
+    public static class HolidayApi
+    {
+        private static readonly HttpClient _http = new();
+
+        public static async Task<List<HolidayItem>> GetHolidaysAsync(int year)
+        {
+            string url = $"https://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo?serviceKey={Program.ApiKey}&solYear={year}&numOfRows=500";
+
+            string xml = await _http.GetStringAsync(url);
+
+            var serializer = new XmlSerializer(typeof(HolidayResponse));
+            using var reader = new StringReader(xml);
+            var response = (HolidayResponse?)serializer.Deserialize(reader);
+
+            if (response?.Header.ResultCode != "00")
+                throw new Exception($"API 오류: {response?.Header.ResultMsg}");
+
+            return response.Body.Items;
         }
     }
 }

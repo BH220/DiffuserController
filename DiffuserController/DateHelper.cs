@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
@@ -10,7 +11,7 @@ namespace DiffuserController
 {
     public class DateHelper
     {
-        public List<DateModel> Dates { get; private set; }
+        public BindingList<DateModel> Dates { get; set; }
         private string Dic = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "BH Soft", "Diffuser Controller");
         private string JsonPath
         {
@@ -40,18 +41,19 @@ namespace DiffuserController
             if (File.Exists(JsonPath))
             {
                 string json = File.ReadAllText(JsonPath);
-                Dates = JsonSerializer.Deserialize<List<DateModel>>(json);
+                Dates = JsonSerializer.Deserialize<BindingList<DateModel>>(json);
 
             }
             else
             {
-                Dates = new List<DateModel>();
+                Dates = new BindingList<DateModel>();
                 Save();
             }
         }
 
         public void Save()
         {
+            SortByDate();
             string json = JsonSerializer.Serialize(Dates);
             File.Delete(JsonPath);
             File.WriteAllText(JsonPath, json);
@@ -67,5 +69,21 @@ namespace DiffuserController
             return result;
             
         }
+        public void SortByDate()
+        {
+            if (Dates == null || Dates.Count <= 1) return;
+
+            var sorted = Dates.OrderBy(x => x.Date).ToList();
+
+            Dates.RaiseListChangedEvents = false;
+            Dates.Clear();
+            foreach (var item in sorted)
+            {
+                Dates.Add(item);
+            }
+            Dates.RaiseListChangedEvents = true;
+            Dates.ResetBindings();
+        }
+
     }
 }
