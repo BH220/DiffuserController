@@ -1,8 +1,7 @@
 
 using System.Web;
 using System.Windows.Forms;
-using System.Xml.Serialization;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Xml.Serialization; 
 
 namespace DiffuserController
 {
@@ -10,7 +9,7 @@ namespace DiffuserController
     {
         private CheckBox _headerCheckBox = null!;
         private bool _syncingCheckState = false;  // 무한 루프 방지
-
+        private bool IsRunning = true;
 
         public frmMain()
         {
@@ -19,10 +18,44 @@ namespace DiffuserController
 
         protected override void OnLoad(EventArgs e)
         {
+            defYear.Value = DateTime.Now.Year;
+            plSchedule.Location = plInterval.Location;
             InitGrid();
             base.OnLoad(e);
-            InitLoadData();
+            LoadSetting();
             monthCalendar1_DateChanged(null, null);
+        }
+
+        protected override void OnShown(EventArgs e)
+        {
+            base.OnShown(e);
+            timer1.Start();
+            NumericUpDown[] items = new NumericUpDown[] {
+                dtStartH, dtStartM, dtEndH, dtEndM, dtTermH, dtTermM, dtTermS, dtTermInterval, dtTermSchedule
+            };
+            foreach (var item in items)
+            {
+                item.ValueChanged += ValueChanged;
+            }
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            lbTime.Text = $"{DateTime.Now.ToString("yy-MM-dd HH:mm:ss")}";
+
+            if (IsRunning)
+            {
+                lbLeft.Text = $"동작중";
+            }
+            else
+            {
+                lbLeft.Text = $"중지중";
+            }
+
+
+            //1시간 2분 4초 뒤 5초간 분사 예정..
+            //분사 중... 남은 시간( 3초 )
+            //[yy-MM-dd HH:mm:ss]
         }
 
         private void InitGrid()
@@ -69,7 +102,7 @@ namespace DiffuserController
         private void Grid_CellContentDoubleClick(object? sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0) return;  // 헤더 더블클릭 방지
-            
+
             DateModel selectedModel = (DateModel)grid.Rows[e.RowIndex].DataBoundItem;
             if (selectedModel != null)
             {
@@ -172,14 +205,14 @@ namespace DiffuserController
 
         private void InitLoadData()
         {
-            dateModelBindingSource.DataSource = DateHelper.Instance.Dates;
+            dateModelBindingSource.DataSource = LocalDbManager.Instance.Dates;
             grid.Refresh();
         }
 
         private void monthCalendar1_DateChanged(object sender, DateRangeEventArgs e)
         {
             txtDt.Text = monthCalendar1.SelectionStart.ToString("yyyy-MM-dd (ddd)");
-            txtMessage.Text = DateHelper.Instance.GetMessage(monthCalendar1.SelectionStart);
+            txtMessage.Text = LocalDbManager.Instance.GetMessage(monthCalendar1.SelectionStart);
         }
 
         private void panel2_Paint(object sender, PaintEventArgs e)
@@ -214,7 +247,7 @@ namespace DiffuserController
             {
                 if (dt.Date > endDate.Date)
                     break;
-                var find = DateHelper.Instance.Dates.FirstOrDefault(x => x.Date == DateOnly.FromDateTime(dt.Date));
+                var find = LocalDbManager.Instance.Dates.FirstOrDefault(x => x.Date == DateOnly.FromDateTime(dt.Date));
                 if (find != null)
                 {
                     find.Message = text;
@@ -224,17 +257,17 @@ namespace DiffuserController
                     DateModel dm = new DateModel();
                     dm.Date = DateOnly.FromDateTime(dt);
                     dm.Message = text;
-                    DateHelper.Instance.Dates.Add(dm);
+                    LocalDbManager.Instance.Dates.Add(dm);
                 }
                 dt = dt.AddDays(1);
             }
-            DateHelper.Instance.Save();
+            LocalDbManager.Instance.Save();
         }
 
         private void btnApply_Click(object sender, EventArgs e)
         {
-            var find = DateHelper.Instance.Dates.FirstOrDefault(x => x.Date == DateOnly.FromDateTime(monthCalendar1.SelectionStart.Date));
-            if(find != null)
+            var find = LocalDbManager.Instance.Dates.FirstOrDefault(x => x.Date == DateOnly.FromDateTime(monthCalendar1.SelectionStart.Date));
+            if (find != null)
             {
                 find.Message = txtMessage.Text;
             }
@@ -243,21 +276,21 @@ namespace DiffuserController
                 DateModel dm = new DateModel();
                 dm.Date = DateOnly.FromDateTime(monthCalendar1.SelectionStart);
                 dm.Message = txtMessage.Text;
-                DateHelper.Instance.Dates.Add(dm);
+                LocalDbManager.Instance.Dates.Add(dm);
             }
-            DateHelper.Instance.Save();
+            LocalDbManager.Instance.Save();
         }
 
         private void btnDel_Click(object sender, EventArgs e)
         {
-            var find = DateHelper.Instance.Dates.FirstOrDefault(x => x.Date == DateOnly.FromDateTime(monthCalendar1.SelectionStart.Date));
+            var find = LocalDbManager.Instance.Dates.FirstOrDefault(x => x.Date == DateOnly.FromDateTime(monthCalendar1.SelectionStart.Date));
             if (find != null)
             {
                 if (MessageBox.Show("선택된 일정을 삭제 하시겠습니가?", "", MessageBoxButtons.YesNo, MessageBoxIcon.Question)
                     == DialogResult.Yes)
                 {
-                    DateHelper.Instance.Dates.Remove(find);
-                    DateHelper.Instance.Save();
+                    LocalDbManager.Instance.Dates.Remove(find);
+                    LocalDbManager.Instance.Save();
                     txtMessage.Text = "";
                 }
             }
@@ -278,9 +311,9 @@ namespace DiffuserController
                 {
                     foreach (var item in checkedItems)
                     {
-                        DateHelper.Instance.Dates.Remove(item);
+                        LocalDbManager.Instance.Dates.Remove(item);
                     }
-                    DateHelper.Instance.Save();
+                    LocalDbManager.Instance.Save();
                     txtMessage.Text = "";
                 }
             }
@@ -289,36 +322,36 @@ namespace DiffuserController
         private void btnSunday_Click(object sender, EventArgs e)
         {
             DateTime dt = new DateTime((int)defYear.Value, 1, 1);
-            while(true)
+            while (true)
             {
-                if(dt.DayOfWeek == DayOfWeek.Sunday)
+                if (dt.DayOfWeek == DayOfWeek.Sunday)
                 {
                     break;
                 }
                 dt = dt.AddDays(1);
             }
-            while(true)
+            while (true)
             {
-                if(dt.Year> defYear.Value)
+                if (dt.Year > defYear.Value)
                 {
                     break;
                 }
                 DateModel dm = new DateModel();
                 dm.Date = DateOnly.FromDateTime(dt);
                 dm.Message = "쉬는날 - 일요일";
-                var find = DateHelper.Instance.Dates.FirstOrDefault(x => x.Date == dm.Date);
-                if(find != null)
+                var find = LocalDbManager.Instance.Dates.FirstOrDefault(x => x.Date == dm.Date);
+                if (find != null)
                 {
                     find.Message = dm.Message;
                 }
                 else
                 {
-                    DateHelper.Instance.Dates.Add(dm);
+                    LocalDbManager.Instance.Dates.Add(dm);
                 }
                 dt = dt.AddDays(7);
             }
-            DateHelper.Instance.Save();
-            
+            LocalDbManager.Instance.Save();
+
         }
 
         private void btnSatDay_Click(object sender, EventArgs e)
@@ -341,18 +374,18 @@ namespace DiffuserController
                 DateModel dm = new DateModel();
                 dm.Date = DateOnly.FromDateTime(dt);
                 dm.Message = "쉬는날 - 토요일";
-                var find = DateHelper.Instance.Dates.FirstOrDefault(x => x.Date == dm.Date);
+                var find = LocalDbManager.Instance.Dates.FirstOrDefault(x => x.Date == dm.Date);
                 if (find != null)
                 {
                     find.Message = dm.Message;
                 }
                 else
                 {
-                    DateHelper.Instance.Dates.Add(dm);
+                    LocalDbManager.Instance.Dates.Add(dm);
                 }
                 dt = dt.AddDays(7);
             }
-            DateHelper.Instance.Save();
+            LocalDbManager.Instance.Save();
         }
 
         private async void btnHoliDay_Click(object sender, EventArgs e)
@@ -364,18 +397,163 @@ namespace DiffuserController
                 DateModel dm = new DateModel();
                 dm.Date = h.Date;
                 dm.Message = h.DateName;
-                var find = DateHelper.Instance.Dates.FirstOrDefault(x => x.Date == dm.Date);
+                var find = LocalDbManager.Instance.Dates.FirstOrDefault(x => x.Date == dm.Date);
                 if (find != null)
                 {
                     find.Message = dm.Message;
                 }
                 else
                 {
-                    DateHelper.Instance.Dates.Add(dm);
+                    LocalDbManager.Instance.Dates.Add(dm);
                 }
             }
 
-            DateHelper.Instance.Save();
+            LocalDbManager.Instance.Save();
+        }
+
+        private void radioButton1_CheckedChanged(object sender, EventArgs e)
+        {
+            plInterval.Visible = true;
+            plSchedule.Visible = false;
+            SaveSetting();
+        }
+
+        private void radioButton2_CheckedChanged(object sender, EventArgs e)
+        {
+            plInterval.Visible = false;
+            plSchedule.Visible = true;
+            SaveSetting();
+        }
+
+        private void btnScAdd_Click(object sender, EventArgs e)
+        {
+            using (frmPopupScAdd frm = new frmPopupScAdd())
+            {
+                frm.AddTimeEvent += Frm_AddTimeEvent;
+                frm.StartPosition = FormStartPosition.CenterParent;
+                frm.ShowDialog(this);
+            }
+        }
+
+        private void Frm_AddTimeEvent(object? sender, DateTime e)
+        {
+            string val = e.ToString("HH:mm");
+            if (lstBox.Items.Contains(val) == false)
+            {
+                lstBox.Items.Add(val);
+                SaveSetting();
+            }
+        }
+
+        private void btnScDel_Click(object sender, EventArgs e)
+        {
+            if (lstBox.SelectedItems.Count <= 0)
+            {
+                MessageBox.Show("삭제 대상을 선택해 주세요");
+                return;
+            }
+            if (MessageBox.Show("선택항목을 삭제 하시겠습니까?", "", MessageBoxButtons.YesNo, MessageBoxIcon.Question)
+                == DialogResult.Yes)
+            {
+                foreach (var item in lstBox.SelectedItems)
+                {
+                    lstBox.Items.Remove(item);
+                }
+                SaveSetting();
+            }
+        }
+
+        private void btnRun_Click(object sender, EventArgs e)
+        {
+            IsRunning = true;
+            btnRun1.Enabled = btnRun2.Enabled = !IsRunning;
+            btnStop1.Enabled = btnStop2.Enabled = IsRunning;
+            SaveSetting();
+        }
+
+        private void btnStop_Click(object sender, EventArgs e)
+        {
+            IsRunning = false;
+            btnRun1.Enabled = btnRun2.Enabled = !IsRunning;
+            btnStop1.Enabled = btnStop2.Enabled = IsRunning;
+            SaveSetting();
+        }
+
+        private void cmbUsbList_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            SaveSetting();
+        }
+
+        private void SaveSetting()
+        {
+            LocalDbManager.Instance.ControlModel.SelectedUSB = cmbUsbList.Text;
+
+            LocalDbManager.Instance.ControlModel.IsInterval = radioButton1.Checked;
+            LocalDbManager.Instance.ControlModel.StartAt = new DateTime(2000, 1, 1, (int)dtStartH.Value, (int)dtStartM.Value, 0);
+            LocalDbManager.Instance.ControlModel.EndAt = new DateTime(2000, 1, 1, (int)dtEndH.Value, (int)dtEndM.Value, 0);
+            LocalDbManager.Instance.ControlModel.IntervalSecond = ((int)dtTermH.Value * 60 * 60) + ((int)dtTermM.Value * 60) + ((int)dtTermS.Value);
+            LocalDbManager.Instance.ControlModel.IntervalMaintainSecond = (int)dtTermInterval.Value;
+
+            LocalDbManager.Instance.ControlModel.IsSchedule = !radioButton1.Checked;
+            List<string> items = new List<string>();
+            foreach (var itm in lstBox.Items)
+            {
+                items.Add(itm.ToString());
+            }
+            LocalDbManager.Instance.ControlModel.ScheduleTimes = items;
+            LocalDbManager.Instance.ControlModel.ScheduleMaintainSecond = (int)dtTermSchedule.Value;
+            LocalDbManager.Instance.Save();
+        }
+
+        private void LoadSetting()
+        {
+            int idx = -1;
+            bool find = false;
+            foreach (var itm in lstBox.Items)
+            {
+                if (itm.ToString() == LocalDbManager.Instance.ControlModel.SelectedUSB)
+                {
+                    find = true;
+                }
+                idx++;
+                if (find)
+                    break;
+            }
+            cmbUsbList.SelectedIndex = idx;
+
+            if (LocalDbManager.Instance.ControlModel.IsInterval)
+                radioButton1.Checked = true;
+            else
+                radioButton2.Checked = true;
+            dtStartH.Value = LocalDbManager.Instance.ControlModel.StartAt.Hour;
+            dtStartM.Value = LocalDbManager.Instance.ControlModel.StartAt.Minute;
+
+            dtEndH.Value = LocalDbManager.Instance.ControlModel.EndAt.Hour;
+            dtEndM.Value = LocalDbManager.Instance.ControlModel.EndAt.Minute;
+
+            dtTermH.Value = dtTermM.Value = dtTermS.Value = 0;
+            if (LocalDbManager.Instance.ControlModel.IntervalSecond < 60)
+                dtTermH.Value = LocalDbManager.Instance.ControlModel.IntervalSecond;
+            else if(LocalDbManager.Instance.ControlModel.IntervalSecond < (60*60))
+                dtTermM.Value = LocalDbManager.Instance.ControlModel.IntervalSecond / 60;
+            else
+                dtTermS.Value = LocalDbManager.Instance.ControlModel.IntervalSecond / 360;
+
+            dtTermInterval.Value = LocalDbManager.Instance.ControlModel.IntervalMaintainSecond;
+
+            LocalDbManager.Instance.ControlModel.IsSchedule = !radioButton1.Checked;
+            foreach (var itm in LocalDbManager.Instance.ControlModel.ScheduleTimes)
+            {
+                lstBox.Items.Add(itm);
+            }
+            dtTermSchedule.Value = LocalDbManager.Instance.ControlModel.ScheduleMaintainSecond;
+
+            InitLoadData();
+        }
+
+        private void ValueChanged(object sender, EventArgs e)
+        {
+            SaveSetting();
         }
     }
 

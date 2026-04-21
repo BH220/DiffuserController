@@ -80,6 +80,7 @@
             txtDays.ReadOnly = true;
             txtDays.Size = new Size(49, 23);
             txtDays.TabIndex = 0;
+            txtDays.Text = "0";
             txtDays.TextAlign = HorizontalAlignment.Center;
             // 
             // label3

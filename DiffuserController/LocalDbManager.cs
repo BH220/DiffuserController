@@ -1,17 +1,22 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace DiffuserController
 {
-    public class DateHelper
+    [JsonObject]
+    public class LocalDbManager
     {
+        [JsonProperty]
         public BindingList<DateModel> Dates { get; set; }
+        [JsonProperty]
+        public ControlModel ControlModel { get; set; }
+
         private string Dic = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "BH Soft", "Diffuser Controller");
         private string JsonPath
         {
@@ -22,31 +27,35 @@ namespace DiffuserController
                 return Path.Combine(Dic, "data.json");
             }
         }
-        private static DateHelper _instance = null;
-        public static DateHelper Instance
+
+        private static LocalDbManager _instance = null;
+        public static LocalDbManager Instance
         {
             get
             {
                 if (_instance == null)
                 {
-                    _instance = new DateHelper();
+                    _instance = new LocalDbManager();
                     _instance.Init();
                 }
                 return _instance;
             }
         }
 
+
         private void Init()
         {
             if (File.Exists(JsonPath))
             {
                 string json = File.ReadAllText(JsonPath);
-                Dates = JsonSerializer.Deserialize<BindingList<DateModel>>(json);
-
+                var a  = JsonConvert.DeserializeObject<LocalDbManager>(json);
+                Dates = a.Dates;
+                ControlModel = a.ControlModel;
             }
             else
             {
                 Dates = new BindingList<DateModel>();
+                ControlModel = new ControlModel();
                 Save();
             }
         }
@@ -54,20 +63,21 @@ namespace DiffuserController
         public void Save()
         {
             SortByDate();
-            string json = JsonSerializer.Serialize(Dates);
+            string json = JsonConvert.SerializeObject(this);
             File.Delete(JsonPath);
             File.WriteAllText(JsonPath, json);
         }
 
+
         public string GetMessage(DateTime selectionStart)
         {
             string result = "";
-            
+
             var find = Dates.FirstOrDefault(x => x.Date == DateOnly.FromDateTime(selectionStart));
             if (find != null)
                 result = find.Message;
             return result;
-            
+
         }
         public void SortByDate()
         {
@@ -84,6 +94,5 @@ namespace DiffuserController
             Dates.RaiseListChangedEvents = true;
             Dates.ResetBindings();
         }
-
     }
 }
