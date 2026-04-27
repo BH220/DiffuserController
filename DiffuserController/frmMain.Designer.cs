@@ -29,12 +29,16 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
+            DataGridViewCellStyle dataGridViewCellStyle5 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle6 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle7 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle8 = new DataGridViewCellStyle();
             tabControl1 = new TabControl();
             tabPage1 = new TabPage();
+            btnOff = new Button();
+            btnOn = new Button();
+            btnRefresh = new Button();
             plInterval = new Panel();
             label3 = new Label();
             dtStartH = new NumericUpDown();
@@ -69,9 +73,9 @@
             label16 = new Label();
             label2 = new Label();
             panel1 = new Panel();
-            radioButton2 = new RadioButton();
+            rbSchedule = new RadioButton();
             label1 = new Label();
-            radioButton1 = new RadioButton();
+            rbInterval = new RadioButton();
             tabPage2 = new TabPage();
             grid = new DataGridView();
             Column1 = new DataGridViewCheckBoxColumn();
@@ -105,9 +109,11 @@
             label17 = new Label();
             statusStrip1 = new StatusStrip();
             lbLeft = new ToolStripStatusLabel();
-            toolStripStatusLabel1 = new ToolStripStatusLabel();
             lbTime = new ToolStripStatusLabel();
+            lbRunning = new ToolStripStatusLabel();
+            toolStripStatusLabel1 = new ToolStripStatusLabel();
             timer1 = new System.Windows.Forms.Timer(components);
+            runningTimer = new System.Windows.Forms.Timer(components);
             tabControl1.SuspendLayout();
             tabPage1.SuspendLayout();
             plInterval.SuspendLayout();
@@ -142,11 +148,14 @@
             tabControl1.Location = new Point(0, 0);
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
-            tabControl1.Size = new Size(839, 567);
+            tabControl1.Size = new Size(646, 567);
             tabControl1.TabIndex = 0;
             // 
             // tabPage1
             // 
+            tabPage1.Controls.Add(btnOff);
+            tabPage1.Controls.Add(btnOn);
+            tabPage1.Controls.Add(btnRefresh);
             tabPage1.Controls.Add(plInterval);
             tabPage1.Controls.Add(plSchedule);
             tabPage1.Controls.Add(cmbUsbList);
@@ -156,10 +165,43 @@
             tabPage1.Location = new Point(4, 24);
             tabPage1.Name = "tabPage1";
             tabPage1.Padding = new Padding(3);
-            tabPage1.Size = new Size(831, 539);
+            tabPage1.Size = new Size(638, 539);
             tabPage1.TabIndex = 0;
             tabPage1.Text = "제어판";
             tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // btnOff
+            // 
+            btnOff.Location = new Point(106, 444);
+            btnOff.Name = "btnOff";
+            btnOff.Size = new Size(75, 45);
+            btnOff.TabIndex = 6;
+            btnOff.Text = "OFF";
+            btnOff.UseVisualStyleBackColor = true;
+            btnOff.Visible = false;
+            btnOff.Click += btnOff_Click;
+            // 
+            // btnOn
+            // 
+            btnOn.Location = new Point(25, 444);
+            btnOn.Name = "btnOn";
+            btnOn.Size = new Size(75, 45);
+            btnOn.TabIndex = 6;
+            btnOn.Text = "ON";
+            btnOn.UseVisualStyleBackColor = true;
+            btnOn.Visible = false;
+            btnOn.Click += btnOn_Click;
+            // 
+            // btnRefresh
+            // 
+            btnRefresh.Image = (Image)resources.GetObject("btnRefresh.Image");
+            btnRefresh.Location = new Point(466, 24);
+            btnRefresh.Margin = new Padding(0);
+            btnRefresh.Name = "btnRefresh";
+            btnRefresh.Size = new Size(26, 26);
+            btnRefresh.TabIndex = 5;
+            btnRefresh.UseVisualStyleBackColor = true;
+            btnRefresh.Click += button1_Click;
             // 
             // plInterval
             // 
@@ -206,6 +248,7 @@
             dtStartH.TabIndex = 1;
             dtStartH.TextAlign = HorizontalAlignment.Center;
             dtStartH.Value = new decimal(new int[] { 23, 0, 0, 0 });
+            dtStartH.ValueChanged += dtStartH_ValueChanged;
             // 
             // btnStop1
             // 
@@ -483,7 +526,6 @@
             cmbUsbList.Name = "cmbUsbList";
             cmbUsbList.Size = new Size(283, 23);
             cmbUsbList.TabIndex = 1;
-            cmbUsbList.SelectedIndexChanged += cmbUsbList_SelectedIndexChanged;
             // 
             // label16
             // 
@@ -505,26 +547,26 @@
             // 
             // panel1
             // 
-            panel1.Controls.Add(radioButton2);
+            panel1.Controls.Add(rbSchedule);
             panel1.Controls.Add(label1);
-            panel1.Controls.Add(radioButton1);
+            panel1.Controls.Add(rbInterval);
             panel1.Location = new Point(177, 80);
             panel1.Name = "panel1";
             panel1.Size = new Size(283, 29);
             panel1.TabIndex = 2;
             // 
-            // radioButton2
+            // rbSchedule
             // 
-            radioButton2.AutoSize = true;
-            radioButton2.Dock = DockStyle.Left;
-            radioButton2.Location = new Point(103, 0);
-            radioButton2.Name = "radioButton2";
-            radioButton2.Size = new Size(74, 29);
-            radioButton2.TabIndex = 2;
-            radioButton2.TabStop = true;
-            radioButton2.Text = "Schedule";
-            radioButton2.UseVisualStyleBackColor = true;
-            radioButton2.CheckedChanged += radioButton2_CheckedChanged;
+            rbSchedule.AutoSize = true;
+            rbSchedule.Dock = DockStyle.Left;
+            rbSchedule.Location = new Point(103, 0);
+            rbSchedule.Name = "rbSchedule";
+            rbSchedule.Size = new Size(74, 29);
+            rbSchedule.TabIndex = 2;
+            rbSchedule.TabStop = true;
+            rbSchedule.Text = "Schedule";
+            rbSchedule.UseVisualStyleBackColor = true;
+            rbSchedule.CheckedChanged += radioButton2_CheckedChanged;
             // 
             // label1
             // 
@@ -535,19 +577,19 @@
             label1.TabIndex = 1;
             label1.Text = " ";
             // 
-            // radioButton1
+            // rbInterval
             // 
-            radioButton1.AutoSize = true;
-            radioButton1.Checked = true;
-            radioButton1.Dock = DockStyle.Left;
-            radioButton1.Location = new Point(0, 0);
-            radioButton1.Name = "radioButton1";
-            radioButton1.Size = new Size(64, 29);
-            radioButton1.TabIndex = 0;
-            radioButton1.TabStop = true;
-            radioButton1.Text = "Interval";
-            radioButton1.UseVisualStyleBackColor = true;
-            radioButton1.CheckedChanged += radioButton1_CheckedChanged;
+            rbInterval.AutoSize = true;
+            rbInterval.Checked = true;
+            rbInterval.Dock = DockStyle.Left;
+            rbInterval.Location = new Point(0, 0);
+            rbInterval.Name = "rbInterval";
+            rbInterval.Size = new Size(64, 29);
+            rbInterval.TabIndex = 0;
+            rbInterval.TabStop = true;
+            rbInterval.Text = "Interval";
+            rbInterval.UseVisualStyleBackColor = true;
+            rbInterval.CheckedChanged += radioButton1_CheckedChanged;
             // 
             // tabPage2
             // 
@@ -558,7 +600,7 @@
             tabPage2.Location = new Point(4, 24);
             tabPage2.Name = "tabPage2";
             tabPage2.Padding = new Padding(3);
-            tabPage2.Size = new Size(831, 539);
+            tabPage2.Size = new Size(638, 539);
             tabPage2.TabIndex = 1;
             tabPage2.Text = "동작 제외 날짜 구성";
             tabPage2.UseVisualStyleBackColor = true;
@@ -578,7 +620,7 @@
             grid.Name = "grid";
             grid.RowHeadersVisible = false;
             grid.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            grid.Size = new Size(589, 466);
+            grid.Size = new Size(396, 466);
             grid.TabIndex = 2;
             // 
             // Column1
@@ -600,8 +642,8 @@
             // yearDataGridViewTextBoxColumn
             // 
             yearDataGridViewTextBoxColumn.DataPropertyName = "year";
-            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            yearDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle5.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            yearDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle5;
             yearDataGridViewTextBoxColumn.HeaderText = "년";
             yearDataGridViewTextBoxColumn.Name = "yearDataGridViewTextBoxColumn";
             yearDataGridViewTextBoxColumn.ReadOnly = true;
@@ -610,8 +652,8 @@
             // monthDataGridViewTextBoxColumn
             // 
             monthDataGridViewTextBoxColumn.DataPropertyName = "month";
-            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            monthDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle6.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            monthDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle6;
             monthDataGridViewTextBoxColumn.HeaderText = "월";
             monthDataGridViewTextBoxColumn.Name = "monthDataGridViewTextBoxColumn";
             monthDataGridViewTextBoxColumn.ReadOnly = true;
@@ -620,8 +662,8 @@
             // dayDataGridViewTextBoxColumn
             // 
             dayDataGridViewTextBoxColumn.DataPropertyName = "day";
-            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dayDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle7.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dayDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle7;
             dayDataGridViewTextBoxColumn.HeaderText = "일";
             dayDataGridViewTextBoxColumn.Name = "dayDataGridViewTextBoxColumn";
             dayDataGridViewTextBoxColumn.ReadOnly = true;
@@ -630,8 +672,8 @@
             // dataGridViewTextBoxColumn1
             // 
             dataGridViewTextBoxColumn1.DataPropertyName = "DoW";
-            dataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewTextBoxColumn1.DefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle8.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewTextBoxColumn1.DefaultCellStyle = dataGridViewCellStyle8;
             dataGridViewTextBoxColumn1.HeaderText = "요일";
             dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
             dataGridViewTextBoxColumn1.ReadOnly = true;
@@ -654,7 +696,7 @@
             panel3.Dock = DockStyle.Top;
             panel3.Location = new Point(239, 38);
             panel3.Name = "panel3";
-            panel3.Size = new Size(589, 32);
+            panel3.Size = new Size(396, 32);
             panel3.TabIndex = 4;
             // 
             // btnSelectedDel
@@ -851,7 +893,7 @@
             panel4.Dock = DockStyle.Top;
             panel4.Location = new Point(3, 3);
             panel4.Name = "panel4";
-            panel4.Size = new Size(825, 35);
+            panel4.Size = new Size(632, 35);
             panel4.TabIndex = 5;
             // 
             // label17
@@ -860,16 +902,16 @@
             label17.Font = new Font("맑은 고딕", 15F);
             label17.Location = new Point(0, 0);
             label17.Name = "label17";
-            label17.Size = new Size(825, 35);
+            label17.Size = new Size(632, 35);
             label17.TabIndex = 0;
             label17.Text = "이 탭을 통해 등록된 날짜에는 스케줄링이 동작하지 않습니다.";
             // 
             // statusStrip1
             // 
-            statusStrip1.Items.AddRange(new ToolStripItem[] { lbLeft, toolStripStatusLabel1, lbTime });
+            statusStrip1.Items.AddRange(new ToolStripItem[] { lbLeft, lbRunning, toolStripStatusLabel1, lbTime });
             statusStrip1.Location = new Point(0, 567);
             statusStrip1.Name = "statusStrip1";
-            statusStrip1.Size = new Size(839, 22);
+            statusStrip1.Size = new Size(646, 22);
             statusStrip1.TabIndex = 1;
             statusStrip1.Text = "statusStrip1";
             // 
@@ -878,30 +920,41 @@
             lbLeft.Name = "lbLeft";
             lbLeft.Size = new Size(0, 17);
             // 
-            // toolStripStatusLabel1
-            // 
-            toolStripStatusLabel1.Name = "toolStripStatusLabel1";
-            toolStripStatusLabel1.Overflow = ToolStripItemOverflow.Always;
-            toolStripStatusLabel1.Size = new Size(824, 17);
-            toolStripStatusLabel1.Spring = true;
-            // 
             // lbTime
             // 
             lbTime.Name = "lbTime";
             lbTime.Size = new Size(0, 17);
+            // 
+            // lbRunning
+            // 
+            lbRunning.Name = "lbRunning";
+            lbRunning.Size = new Size(0, 17);
+            // 
+            // toolStripStatusLabel1
+            // 
+            toolStripStatusLabel1.Name = "toolStripStatusLabel1";
+            toolStripStatusLabel1.Overflow = ToolStripItemOverflow.Always;
+            toolStripStatusLabel1.Size = new Size(600, 17);
+            toolStripStatusLabel1.Spring = true;
             // 
             // timer1
             // 
             timer1.Interval = 1000;
             timer1.Tick += timer1_Tick;
             // 
+            // runningTimer
+            // 
+            runningTimer.Interval = 1000;
+            runningTimer.Tick += runningTimer_Tick;
+            // 
             // frmMain
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(839, 589);
+            ClientSize = new Size(646, 589);
             Controls.Add(tabControl1);
             Controls.Add(statusStrip1);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             MinimumSize = new Size(662, 628);
             Name = "frmMain";
             Text = "디퓨저 제어기";
@@ -943,7 +996,7 @@
         private TabPage tabPage2;
         private Label label2;
         private Panel panel1;
-        private RadioButton radioButton2;
+        private RadioButton rbSchedule;
         private Label label1;
         private StatusStrip statusStrip1;
         private Button btnHoliDay;
@@ -977,7 +1030,7 @@
         private GroupBox groupBox1;
         private ComboBox cmbUsbList;
         private Label label16;
-        private RadioButton radioButton1;
+        private RadioButton rbInterval;
         private Panel panel4;
         private Label label17;
         private Panel plInterval;
@@ -1014,5 +1067,10 @@
         private ToolStripStatusLabel lbLeft;
         private System.Windows.Forms.Timer timer1;
         private ToolStripStatusLabel toolStripStatusLabel1;
+        private Button btnRefresh;
+        private Button btnOff;
+        private Button btnOn;
+        private System.Windows.Forms.Timer runningTimer;
+        private ToolStripStatusLabel lbRunning;
     }
 }

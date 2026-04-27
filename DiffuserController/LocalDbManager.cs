@@ -17,6 +17,8 @@ namespace DiffuserController
         [JsonProperty]
         public ControlModel ControlModel { get; set; }
 
+        public List<ComPortItem> Ports { get; set; }
+
         private string Dic = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "BH Soft", "Diffuser Controller");
         private string JsonPath
         {

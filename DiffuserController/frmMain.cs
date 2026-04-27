@@ -1,4 +1,8 @@
 
+using Microsoft.VisualBasic;
+using System.IO.Ports;
+using System.Management;
+using System.Text.RegularExpressions;
 using System.Web;
 using System.Windows.Forms;
 using System.Xml.Serialization; 
@@ -10,6 +14,11 @@ namespace DiffuserController
         private CheckBox _headerCheckBox = null!;
         private bool _syncingCheckState = false;  // 무한 루프 방지
         private bool IsRunning = true;
+        DateTime dtToday = DateTime.Now;
+        private SerialPort? _port;
+        int runningSec = 0;
+
+        List<DateTime> lstTargetDatetime = new List<DateTime>();
 
         public frmMain()
         {
@@ -18,17 +27,76 @@ namespace DiffuserController
 
         protected override void OnLoad(EventArgs e)
         {
-            defYear.Value = DateTime.Now.Year;
-            plSchedule.Location = plInterval.Location;
-            InitGrid();
             base.OnLoad(e);
-            LoadSetting();
-            monthCalendar1_DateChanged(null, null);
+#if DEBUG
+            btnOn.Visible = btnOff.Visible = true;
+#endif
         }
+
+        private void LoadUSB()
+        {
+            List<ComPortItem> ports = new List<ComPortItem>();
+
+            using var searcher = new ManagementObjectSearcher(
+                "SELECT Name, DeviceID FROM Win32_PnPEntity WHERE Name LIKE '%(COM%'");
+
+            foreach (ManagementObject obj in searcher.Get())
+            {
+                var name = obj["Name"]?.ToString();   // "USB-SERIAL CH340 (COM3)"
+                var deviceId = obj["DeviceID"]?.ToString();
+
+                if (name == null) continue;
+
+
+                // COM 포트 번호 추출
+                var match = Regex.Match(name, @"\(COM\d+\)");
+                if (match.Success)
+                {
+                    ComPortItem ci = new ComPortItem();
+                    var comPort = match.Value.Trim('(', ')').Trim();
+                    var deviceName = name.Replace(match.Value, "").Trim();
+                    var display = $"{comPort} : {deviceName}";
+                    ci.Name = name;
+                    ci.ComPort = comPort;
+                    ci.Display = display;
+                    ports.Add(ci);
+                }
+            }
+
+
+            cmbUsbList.Items.Clear();
+
+            foreach (var ci in ports)
+            {
+                // 표시: "USB-SERIAL CH340 (COM3)"
+                // 실제 사용: "COM3"
+                cmbUsbList.Items.Add(new ComPortItem
+                {
+                    ComPort = ci.ComPort,
+                    Name = ci.Name,
+                    Display = ci.Display
+                });
+            }
+
+            cmbUsbList.DisplayMember = "Display";
+            cmbUsbList.ValueMember = "ComPort";
+        }
+
+
 
         protected override void OnShown(EventArgs e)
         {
             base.OnShown(e);
+
+            dtToday = DateTime.Now;
+            defYear.Value = DateTime.Now.Year;
+            plSchedule.Location = plInterval.Location;
+            InitGrid();
+            LoadUSB();
+            LoadSetting();
+            SettingTargetDatetime();
+            monthCalendar1_DateChanged(null, null);
+
             timer1.Start();
             NumericUpDown[] items = new NumericUpDown[] {
                 dtStartH, dtStartM, dtEndH, dtEndM, dtTermH, dtTermM, dtTermS, dtTermInterval, dtTermSchedule
@@ -37,19 +105,59 @@ namespace DiffuserController
             {
                 item.ValueChanged += ValueChanged;
             }
+            cmbUsbList.SelectedIndexChanged += cmbUsbList_SelectedIndexChanged;
+            SetEnabled();
+            cmbUsbList_SelectedIndexChanged(null, null);
         }
-
+         
         private void timer1_Tick(object sender, EventArgs e)
         {
-            lbTime.Text = $"{DateTime.Now.ToString("yy-MM-dd HH:mm:ss")}";
-
-            if (IsRunning)
+            lbTime.Text = $"{DateTime.Now.ToString("yy-MM-dd (ddd) HH:mm:ss")}";
+            if (dtToday.Day != DateTime.Now.Day)
             {
-                lbLeft.Text = $"동작중";
+                SettingTargetDatetime();
+                dtToday = DateTime.Now;
+            }
+
+            DateModel dm = LocalDbManager.Instance.Dates.FirstOrDefault(x => x.Date == DateOnly.FromDateTime(DateTime.Now));
+            if (dm == null)
+            {//동작해야 하는 날
+                if (IsRunning)
+                {
+                    DateTime? target = lstTargetDatetime.Where(x => x >= DateTime.Now).FirstOrDefault();
+                    if (target != DateTime.MinValue)
+                    {
+                        TimeSpan ts = target.Value - DateTime.Now;
+                        if (ts.Hours > 0)
+                            lbLeft.Text = $"{ts.Hours}시간 {ts.Minutes}분 {ts.Seconds}초 뒤 {dtTermInterval.Value}초간 분사 예정..";
+                        else if (ts.Minutes > 0)
+                            lbLeft.Text = $"{ts.Minutes}분 {ts.Seconds}초 뒤 {dtTermInterval.Value}초간 분사 예정..";
+                        else if(ts.Seconds > 0)
+                            lbLeft.Text = $"{ts.Seconds}초 뒤 {dtTermInterval.Value}초간 분사 예정..";
+                        else
+                        {
+                            if (rbInterval.Checked)
+                                runningSec = (int)dtTermInterval.Value;
+                            else
+                                runningSec = (int)dtTermSchedule.Value;
+                            runningTimer.Enabled = true;
+                            runningTimer.Start();
+                            btnOn_Click(null, null);
+                        }
+                    }
+                    else
+                    {
+                        lbLeft.Text = $"오늘 동작 일정 종료";
+                    }
+                }
+                else
+                {
+                    lbLeft.Text = $"중지됨";
+                }
             }
             else
             {
-                lbLeft.Text = $"중지중";
+                lbLeft.Text = $"오늘은 동작 제외 날짜 입니다. ( {dm.Message} )";
             }
 
 
@@ -463,12 +571,35 @@ namespace DiffuserController
             }
         }
 
+        private void SetEnabled()
+        {
+            List<Control> lstControl = new List<Control>();
+            lstControl.Add(cmbUsbList);
+            lstControl.Add(btnRefresh);
+            lstControl.Add(rbInterval);
+            lstControl.Add(rbSchedule);
+            lstControl.Add(dtStartH);
+            lstControl.Add(dtStartM);
+            lstControl.Add(dtEndH);
+            lstControl.Add(dtEndM);
+            lstControl.Add(dtTermH);
+            lstControl.Add(dtTermM);
+            lstControl.Add(dtTermS);
+            lstControl.Add(dtTermSchedule);
+            lstControl.Add(lstBox);
+            lstControl.Add(btnScAdd);
+            lstControl.Add(btnDel);
+            lstControl.Add(dtTermInterval);
+            lstControl.ForEach(x => x.Enabled = !IsRunning);
+        }
         private void btnRun_Click(object sender, EventArgs e)
         {
             IsRunning = true;
             btnRun1.Enabled = btnRun2.Enabled = !IsRunning;
             btnStop1.Enabled = btnStop2.Enabled = IsRunning;
             SaveSetting();
+            SettingTargetDatetime();
+            SetEnabled();
         }
 
         private void btnStop_Click(object sender, EventArgs e)
@@ -477,24 +608,31 @@ namespace DiffuserController
             btnRun1.Enabled = btnRun2.Enabled = !IsRunning;
             btnStop1.Enabled = btnStop2.Enabled = IsRunning;
             SaveSetting();
+            SetEnabled();
         }
 
         private void cmbUsbList_SelectedIndexChanged(object sender, EventArgs e)
         {
             SaveSetting();
+            ComPortItem ci = cmbUsbList.SelectedItem as ComPortItem;
+            if (ci != null)
+            {
+                _port = new SerialPort(ci.ComPort, 9600);
+                _port.Open();
+            }
         }
 
         private void SaveSetting()
         {
             LocalDbManager.Instance.ControlModel.SelectedUSB = cmbUsbList.Text;
 
-            LocalDbManager.Instance.ControlModel.IsInterval = radioButton1.Checked;
+            LocalDbManager.Instance.ControlModel.IsInterval = rbInterval.Checked;
             LocalDbManager.Instance.ControlModel.StartAt = new DateTime(2000, 1, 1, (int)dtStartH.Value, (int)dtStartM.Value, 0);
             LocalDbManager.Instance.ControlModel.EndAt = new DateTime(2000, 1, 1, (int)dtEndH.Value, (int)dtEndM.Value, 0);
             LocalDbManager.Instance.ControlModel.IntervalSecond = ((int)dtTermH.Value * 60 * 60) + ((int)dtTermM.Value * 60) + ((int)dtTermS.Value);
             LocalDbManager.Instance.ControlModel.IntervalMaintainSecond = (int)dtTermInterval.Value;
 
-            LocalDbManager.Instance.ControlModel.IsSchedule = !radioButton1.Checked;
+            LocalDbManager.Instance.ControlModel.IsSchedule = !rbInterval.Checked;
             List<string> items = new List<string>();
             foreach (var itm in lstBox.Items)
             {
@@ -507,11 +645,47 @@ namespace DiffuserController
 
         private void LoadSetting()
         {
+            FindUsb();
+
+            dtStartH.Value = LocalDbManager.Instance.ControlModel.StartAt.Hour;
+            dtStartM.Value = LocalDbManager.Instance.ControlModel.StartAt.Minute;
+
+            dtEndH.Value = LocalDbManager.Instance.ControlModel.EndAt.Hour;
+            dtEndM.Value = LocalDbManager.Instance.ControlModel.EndAt.Minute;
+
+            dtTermH.Value = dtTermM.Value = dtTermS.Value = 0;
+
+            int h = LocalDbManager.Instance.ControlModel.IntervalSecond / 3600;
+            int m = (LocalDbManager.Instance.ControlModel.IntervalSecond % 3600) / 60;
+            int s = (LocalDbManager.Instance.ControlModel.IntervalSecond % 3600) % 60;
+            dtTermH.Value = h;
+            dtTermM.Value = m;
+            dtTermS.Value = s;
+            dtTermInterval.Value = LocalDbManager.Instance.ControlModel.IntervalMaintainSecond;
+
+            LocalDbManager.Instance.ControlModel.IsSchedule = !rbInterval.Checked;
+            foreach (var itm in LocalDbManager.Instance.ControlModel.ScheduleTimes)
+            {
+                lstBox.Items.Add(itm);
+            }
+            dtTermSchedule.Value = LocalDbManager.Instance.ControlModel.ScheduleMaintainSecond;
+
+            if (LocalDbManager.Instance.ControlModel.IsInterval)
+                rbInterval.Checked = true;
+            else
+                rbSchedule.Checked = true;
+            InitLoadData();
+
+            SettingTargetDatetime();
+        }
+
+        private void FindUsb()
+        {
             int idx = -1;
             bool find = false;
-            foreach (var itm in lstBox.Items)
+            foreach (ComPortItem itm in cmbUsbList.Items)
             {
-                if (itm.ToString() == LocalDbManager.Instance.ControlModel.SelectedUSB)
+                if (itm.Display == LocalDbManager.Instance.ControlModel.SelectedUSB)
                 {
                     find = true;
                 }
@@ -520,40 +694,83 @@ namespace DiffuserController
                     break;
             }
             cmbUsbList.SelectedIndex = idx;
+        }
 
-            if (LocalDbManager.Instance.ControlModel.IsInterval)
-                radioButton1.Checked = true;
-            else
-                radioButton2.Checked = true;
-            dtStartH.Value = LocalDbManager.Instance.ControlModel.StartAt.Hour;
-            dtStartM.Value = LocalDbManager.Instance.ControlModel.StartAt.Minute;
-
-            dtEndH.Value = LocalDbManager.Instance.ControlModel.EndAt.Hour;
-            dtEndM.Value = LocalDbManager.Instance.ControlModel.EndAt.Minute;
-
-            dtTermH.Value = dtTermM.Value = dtTermS.Value = 0;
-            if (LocalDbManager.Instance.ControlModel.IntervalSecond < 60)
-                dtTermH.Value = LocalDbManager.Instance.ControlModel.IntervalSecond;
-            else if(LocalDbManager.Instance.ControlModel.IntervalSecond < (60*60))
-                dtTermM.Value = LocalDbManager.Instance.ControlModel.IntervalSecond / 60;
-            else
-                dtTermS.Value = LocalDbManager.Instance.ControlModel.IntervalSecond / 360;
-
-            dtTermInterval.Value = LocalDbManager.Instance.ControlModel.IntervalMaintainSecond;
-
-            LocalDbManager.Instance.ControlModel.IsSchedule = !radioButton1.Checked;
-            foreach (var itm in LocalDbManager.Instance.ControlModel.ScheduleTimes)
+        private void SettingTargetDatetime()
+        {
+            lstTargetDatetime = new List<DateTime>();
+            int y = DateTime.Now.Year;
+            int m = DateTime.Now.Month;
+            int d = DateTime.Now.Day;
+            if (rbInterval.Checked)
             {
-                lstBox.Items.Add(itm);
-            }
-            dtTermSchedule.Value = LocalDbManager.Instance.ControlModel.ScheduleMaintainSecond;
+                DateTime dt = new DateTime(y, m, d, (int)dtStartH.Value, (int)dtStartM.Value, 0);
+                DateTime edt = new DateTime(y, m, d, (int)dtEndH.Value, (int)dtEndM.Value, 0);
 
-            InitLoadData();
+                while (true)
+                {
+                    if (dt > edt)
+                        break;
+                    lstTargetDatetime.Add(dt);
+                    dt = dt.AddHours((int)dtTermH.Value);
+                    dt = dt.AddMinutes((int)dtTermM.Value);
+                    dt = dt.AddSeconds((int)dtTermS.Value);
+                }
+            }
+            else
+            {
+                foreach (string item in lstBox.Items)
+                {
+                    var parts = item.Split(':');
+                    int h = int.Parse(parts[0]);
+                    int mm = int.Parse(parts[1]);
+                    DateTime dt = new DateTime(y, m, d, h, mm, 0);
+                    lstTargetDatetime.Add(dt);
+                }
+            }
         }
 
         private void ValueChanged(object sender, EventArgs e)
         {
             SaveSetting();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            LoadUSB();
+            FindUsb();
+        }
+
+        private void btnOn_Click(object sender, EventArgs e)
+        {
+            _port?.Write(new byte[] { 0xA0, 0x01, 0x01, 0xA2 }, 0, 4);
+        }
+
+        private void btnOff_Click(object sender, EventArgs e)
+        {
+            _port?.Write(new byte[] { 0xA0, 0x01, 0x00, 0xA1 }, 0, 4);
+        }
+
+        private void dtStartH_ValueChanged(object sender, EventArgs e)
+        {
+
+        }
+
+
+        private void runningTimer_Tick(object sender, EventArgs e)
+        {
+            if (runningSec == 0)
+            {
+                lbRunning.Text = "";
+                btnOff_Click(null, null);
+                runningTimer.Stop();
+                runningTimer.Enabled = false;
+            }
+            else
+            {
+                lbRunning.Text = $" ( 분사 중... 남은 시간: {runningSec}초 )";
+                runningSec--;
+            }
         }
     }
 
@@ -578,3 +795,4 @@ namespace DiffuserController
         }
     }
 }
+
