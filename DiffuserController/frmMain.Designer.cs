@@ -999,7 +999,7 @@
             MinimizeBox = false;
             MinimumSize = new Size(662, 628);
             Name = "frmMain";
-            StartPosition = FormStartPosition.CenterParent;
+            StartPosition = FormStartPosition.Manual;
             Text = "디퓨저 제어기";
             tabControl1.ResumeLayout(false);
             tabPage1.ResumeLayout(false);

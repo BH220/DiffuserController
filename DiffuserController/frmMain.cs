@@ -25,6 +25,7 @@ namespace DiffuserController
         public frmMain()
         {
             InitializeComponent();
+            SetFormPosition();
         }
 
         protected override void OnLoad(EventArgs e)
@@ -36,6 +37,13 @@ namespace DiffuserController
             RegistOnString();
 #endif
 
+        }
+
+        private void SetFormPosition()
+        {
+            var screen = Screen.PrimaryScreen.WorkingArea; // 작업표시줄 제외한 영역
+            Left = screen.Right - Width + 10;   // 우측 여백 10px
+            Top = screen.Bottom - Height + 10;  // 하단 여백 10px
         }
 
         private void RegistOnString()
