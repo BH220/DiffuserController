@@ -1,5 +1,6 @@
 
 using Microsoft.VisualBasic;
+using System.Diagnostics;
 using System.IO.Ports;
 using System.Management;
 using System.Text.RegularExpressions;
@@ -15,6 +16,7 @@ namespace DiffuserController
         private bool _syncingCheckState = false;  // 무한 루프 방지
         private bool IsRunning = true;
         DateTime dtToday = DateTime.Now;
+        private bool _isRealClose = false;
         private SerialPort? _port;
         int runningSec = 0;
 
@@ -30,7 +32,79 @@ namespace DiffuserController
             base.OnLoad(e);
 #if DEBUG
             btnOn.Visible = btnOff.Visible = true;
+#else
+            RegistOnString();
 #endif
+
+        }
+
+        private void RegistOnString()
+        {
+            try
+            {
+                string exePath = Application.ExecutablePath;
+                string taskName = "DiffuserController";
+
+                string xml = $@"<?xml version=""1.0"" encoding=""UTF-16""?>
+<Task version=""1.2"" xmlns=""http://schemas.microsoft.com/windows/2004/02/mit/task"">
+  <RegistrationInfo>
+    <Description>디퓨저 제어기</Description>
+  </RegistrationInfo>
+  <Triggers>
+    <BootTrigger>
+      <Enabled>true</Enabled>
+    </BootTrigger>
+  </Triggers>
+  <Settings>
+    <MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy>
+    <DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries>
+    <StopIfGoingOnBatteries>false</StopIfGoingOnBatteries>
+    <ExecutionTimeLimit>PT0S</ExecutionTimeLimit>
+    <RestartOnFailure>
+      <Interval>PT10M</Interval>
+      <Count>100</Count>
+    </RestartOnFailure>
+  </Settings>
+  <Actions>
+    <Exec>
+      <Command>{exePath}</Command>
+    </Exec>
+  </Actions>
+  <Principals>
+    <Principal>
+      <LogonType>InteractiveToken</LogonType>
+      <RunLevel>HighestAvailable</RunLevel>
+    </Principal>
+  </Principals>
+</Task>";
+
+                // XML 임시 파일로 저장
+                string xmlPath = Path.Combine(Path.GetTempPath(), "relay_task.xml");
+                File.WriteAllText(xmlPath, xml, System.Text.Encoding.Unicode);
+
+                // schtasks로 등록
+                var psi = new ProcessStartInfo
+                {
+                    FileName = "schtasks.exe",
+                    Arguments = $"/Create /TN \"{taskName}\" /XML \"{xmlPath}\" /F",
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true
+                };
+
+                using var process = Process.Start(psi);
+                process!.WaitForExit();
+
+                File.Delete(xmlPath);
+
+                if (process.ExitCode != 0)
+                    MessageBox.Show("등록 실패. 관리자 권한으로 실행해주세요.", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"오류: {ex.Message}", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void LoadUSB()
@@ -108,8 +182,9 @@ namespace DiffuserController
             cmbUsbList.SelectedIndexChanged += cmbUsbList_SelectedIndexChanged;
             SetEnabled();
             cmbUsbList_SelectedIndexChanged(null, null);
+            Close();
         }
-         
+
         private void timer1_Tick(object sender, EventArgs e)
         {
             lbTime.Text = $"{DateTime.Now.ToString("yy-MM-dd (ddd) HH:mm:ss")}";
@@ -132,7 +207,7 @@ namespace DiffuserController
                             lbLeft.Text = $"{ts.Hours}시간 {ts.Minutes}분 {ts.Seconds}초 뒤 {dtTermInterval.Value}초간 분사 예정..";
                         else if (ts.Minutes > 0)
                             lbLeft.Text = $"{ts.Minutes}분 {ts.Seconds}초 뒤 {dtTermInterval.Value}초간 분사 예정..";
-                        else if(ts.Seconds > 0)
+                        else if (ts.Seconds > 0)
                             lbLeft.Text = $"{ts.Seconds}초 뒤 {dtTermInterval.Value}초간 분사 예정..";
                         else
                         {
@@ -771,6 +846,43 @@ namespace DiffuserController
                 lbRunning.Text = $" ( 분사 중... 남은 시간: {runningSec}초 )";
                 runningSec--;
             }
+        }
+
+        private void RealClose()
+        {
+            _isRealClose = true;
+            Application.Exit();
+        }
+
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            if (!_isRealClose)
+            {
+                e.Cancel = true;
+                Hide();
+            }
+            else
+            {
+                notifyIcon1.Dispose();
+            }
+            base.OnFormClosing(e);
+        }
+
+        private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            열기ToolStripMenuItem1_Click(null, null);
+        }
+
+        private void 열기ToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            Show();
+            WindowState = FormWindowState.Normal;
+            BringToFront();
+        }
+
+        private void 종료ToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            RealClose();
         }
     }
 

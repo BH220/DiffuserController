@@ -30,10 +30,10 @@
         {
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
-            DataGridViewCellStyle dataGridViewCellStyle5 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle6 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle7 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle8 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
             tabControl1 = new TabControl();
             tabPage1 = new TabPage();
             btnOff = new Button();
@@ -109,11 +109,16 @@
             label17 = new Label();
             statusStrip1 = new StatusStrip();
             lbLeft = new ToolStripStatusLabel();
-            lbTime = new ToolStripStatusLabel();
             lbRunning = new ToolStripStatusLabel();
             toolStripStatusLabel1 = new ToolStripStatusLabel();
+            lbTime = new ToolStripStatusLabel();
             timer1 = new System.Windows.Forms.Timer(components);
             runningTimer = new System.Windows.Forms.Timer(components);
+            notifyIcon1 = new NotifyIcon(components);
+            contextMenuStrip1 = new ContextMenuStrip(components);
+            열기ToolStripMenuItem1 = new ToolStripMenuItem();
+            toolStripSeparator2 = new ToolStripSeparator();
+            종료ToolStripMenuItem1 = new ToolStripMenuItem();
             tabControl1.SuspendLayout();
             tabPage1.SuspendLayout();
             plInterval.SuspendLayout();
@@ -138,6 +143,7 @@
             groupBox1.SuspendLayout();
             panel4.SuspendLayout();
             statusStrip1.SuspendLayout();
+            contextMenuStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // tabControl1
@@ -642,8 +648,8 @@
             // yearDataGridViewTextBoxColumn
             // 
             yearDataGridViewTextBoxColumn.DataPropertyName = "year";
-            dataGridViewCellStyle5.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            yearDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            yearDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle1;
             yearDataGridViewTextBoxColumn.HeaderText = "년";
             yearDataGridViewTextBoxColumn.Name = "yearDataGridViewTextBoxColumn";
             yearDataGridViewTextBoxColumn.ReadOnly = true;
@@ -652,8 +658,8 @@
             // monthDataGridViewTextBoxColumn
             // 
             monthDataGridViewTextBoxColumn.DataPropertyName = "month";
-            dataGridViewCellStyle6.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            monthDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            monthDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle2;
             monthDataGridViewTextBoxColumn.HeaderText = "월";
             monthDataGridViewTextBoxColumn.Name = "monthDataGridViewTextBoxColumn";
             monthDataGridViewTextBoxColumn.ReadOnly = true;
@@ -662,8 +668,8 @@
             // dayDataGridViewTextBoxColumn
             // 
             dayDataGridViewTextBoxColumn.DataPropertyName = "day";
-            dataGridViewCellStyle7.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dayDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle7;
+            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dayDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle3;
             dayDataGridViewTextBoxColumn.HeaderText = "일";
             dayDataGridViewTextBoxColumn.Name = "dayDataGridViewTextBoxColumn";
             dayDataGridViewTextBoxColumn.ReadOnly = true;
@@ -672,8 +678,8 @@
             // dataGridViewTextBoxColumn1
             // 
             dataGridViewTextBoxColumn1.DataPropertyName = "DoW";
-            dataGridViewCellStyle8.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewTextBoxColumn1.DefaultCellStyle = dataGridViewCellStyle8;
+            dataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewTextBoxColumn1.DefaultCellStyle = dataGridViewCellStyle4;
             dataGridViewTextBoxColumn1.HeaderText = "요일";
             dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
             dataGridViewTextBoxColumn1.ReadOnly = true;
@@ -920,11 +926,6 @@
             lbLeft.Name = "lbLeft";
             lbLeft.Size = new Size(0, 17);
             // 
-            // lbTime
-            // 
-            lbTime.Name = "lbTime";
-            lbTime.Size = new Size(0, 17);
-            // 
             // lbRunning
             // 
             lbRunning.Name = "lbRunning";
@@ -934,8 +935,13 @@
             // 
             toolStripStatusLabel1.Name = "toolStripStatusLabel1";
             toolStripStatusLabel1.Overflow = ToolStripItemOverflow.Always;
-            toolStripStatusLabel1.Size = new Size(600, 17);
+            toolStripStatusLabel1.Size = new Size(631, 17);
             toolStripStatusLabel1.Spring = true;
+            // 
+            // lbTime
+            // 
+            lbTime.Name = "lbTime";
+            lbTime.Size = new Size(0, 17);
             // 
             // timer1
             // 
@@ -947,6 +953,39 @@
             runningTimer.Interval = 1000;
             runningTimer.Tick += runningTimer_Tick;
             // 
+            // notifyIcon1
+            // 
+            notifyIcon1.ContextMenuStrip = contextMenuStrip1;
+            notifyIcon1.Icon = (Icon)resources.GetObject("notifyIcon1.Icon");
+            notifyIcon1.Text = "디퓨저 제어기";
+            notifyIcon1.Visible = true;
+            notifyIcon1.MouseDoubleClick += notifyIcon1_MouseDoubleClick;
+            // 
+            // contextMenuStrip1
+            // 
+            contextMenuStrip1.Items.AddRange(new ToolStripItem[] { 열기ToolStripMenuItem1, toolStripSeparator2, 종료ToolStripMenuItem1 });
+            contextMenuStrip1.Name = "contextMenuStrip1";
+            contextMenuStrip1.Size = new Size(99, 54);
+            // 
+            // 열기ToolStripMenuItem1
+            // 
+            열기ToolStripMenuItem1.Name = "열기ToolStripMenuItem1";
+            열기ToolStripMenuItem1.Size = new Size(98, 22);
+            열기ToolStripMenuItem1.Text = "열기";
+            열기ToolStripMenuItem1.Click += 열기ToolStripMenuItem1_Click;
+            // 
+            // toolStripSeparator2
+            // 
+            toolStripSeparator2.Name = "toolStripSeparator2";
+            toolStripSeparator2.Size = new Size(95, 6);
+            // 
+            // 종료ToolStripMenuItem1
+            // 
+            종료ToolStripMenuItem1.Name = "종료ToolStripMenuItem1";
+            종료ToolStripMenuItem1.Size = new Size(98, 22);
+            종료ToolStripMenuItem1.Text = "종료";
+            종료ToolStripMenuItem1.Click += 종료ToolStripMenuItem1_Click;
+            // 
             // frmMain
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -954,9 +993,13 @@
             ClientSize = new Size(646, 589);
             Controls.Add(tabControl1);
             Controls.Add(statusStrip1);
+            FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
+            MaximizeBox = false;
+            MinimizeBox = false;
             MinimumSize = new Size(662, 628);
             Name = "frmMain";
+            StartPosition = FormStartPosition.CenterParent;
             Text = "디퓨저 제어기";
             tabControl1.ResumeLayout(false);
             tabPage1.ResumeLayout(false);
@@ -985,6 +1028,7 @@
             panel4.ResumeLayout(false);
             statusStrip1.ResumeLayout(false);
             statusStrip1.PerformLayout();
+            contextMenuStrip1.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -1072,5 +1116,10 @@
         private Button btnOn;
         private System.Windows.Forms.Timer runningTimer;
         private ToolStripStatusLabel lbRunning;
+        private NotifyIcon notifyIcon1;
+        private ContextMenuStrip contextMenuStrip1;
+        private ToolStripMenuItem 열기ToolStripMenuItem1;
+        private ToolStripSeparator toolStripSeparator2;
+        private ToolStripMenuItem 종료ToolStripMenuItem1;
     }
 }
