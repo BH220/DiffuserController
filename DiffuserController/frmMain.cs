@@ -1,4 +1,5 @@
 
+using DiffuserController;
 using Microsoft.VisualBasic;
 using System.Diagnostics;
 using System.IO.Ports;
@@ -6,12 +7,14 @@ using System.Management;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Windows.Forms;
+using System.Xml.Linq;
 using System.Xml.Serialization; 
 
 namespace DiffuserController
 {
     public partial class frmMain : Form
     {
+        #region 변수, 생성자, 이벤트 프로퍼티
         private CheckBox _headerCheckBox = null!;
         private bool _syncingCheckState = false;  // 무한 루프 방지
         private bool IsRunning = true;
@@ -19,9 +22,10 @@ namespace DiffuserController
         private bool _isRealClose = false;
         private SerialPort? _port;
         int runningSec = 0;
-
         List<DateTime> lstTargetDatetime = new List<DateTime>();
+        #endregion
 
+        #region 생성자, 오버라이드
         public frmMain()
         {
             InitializeComponent();
@@ -36,135 +40,7 @@ namespace DiffuserController
 #else
             RegistOnString();
 #endif
-
         }
-
-        private void SetFormPosition()
-        {
-            var screen = Screen.PrimaryScreen.WorkingArea; // 작업표시줄 제외한 영역
-            Left = screen.Right - Width + 10;   // 우측 여백 10px
-            Top = screen.Bottom - Height + 10;  // 하단 여백 10px
-        }
-
-        private void RegistOnString()
-        {
-            try
-            {
-                string exePath = Application.ExecutablePath;
-                string taskName = "DiffuserController";
-
-                string xml = $@"<?xml version=""1.0"" encoding=""UTF-16""?>
-<Task version=""1.2"" xmlns=""http://schemas.microsoft.com/windows/2004/02/mit/task"">
-  <RegistrationInfo>
-    <Description>디퓨저 제어기</Description>
-  </RegistrationInfo>
-  <Triggers>
-    <BootTrigger>
-      <Enabled>true</Enabled>
-    </BootTrigger>
-  </Triggers>
-  <Settings>
-    <MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy>
-    <DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries>
-    <StopIfGoingOnBatteries>false</StopIfGoingOnBatteries>
-    <ExecutionTimeLimit>PT0S</ExecutionTimeLimit>
-    <RestartOnFailure>
-      <Interval>PT10M</Interval>
-      <Count>100</Count>
-    </RestartOnFailure>
-  </Settings>
-  <Actions>
-    <Exec>
-      <Command>{exePath}</Command>
-    </Exec>
-  </Actions>
-  <Principals>
-    <Principal>
-      <LogonType>InteractiveToken</LogonType>
-      <RunLevel>HighestAvailable</RunLevel>
-    </Principal>
-  </Principals>
-</Task>";
-
-                // XML 임시 파일로 저장
-                string xmlPath = Path.Combine(Path.GetTempPath(), "relay_task.xml");
-                File.WriteAllText(xmlPath, xml, System.Text.Encoding.Unicode);
-
-                // schtasks로 등록
-                var psi = new ProcessStartInfo
-                {
-                    FileName = "schtasks.exe",
-                    Arguments = $"/Create /TN \"{taskName}\" /XML \"{xmlPath}\" /F",
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true
-                };
-
-                using var process = Process.Start(psi);
-                process!.WaitForExit();
-
-                File.Delete(xmlPath);
-
-                if (process.ExitCode != 0)
-                    MessageBox.Show("등록 실패. 관리자 권한으로 실행해주세요.", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"오류: {ex.Message}", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private void LoadUSB()
-        {
-            List<ComPortItem> ports = new List<ComPortItem>();
-
-            using var searcher = new ManagementObjectSearcher(
-                "SELECT Name, DeviceID FROM Win32_PnPEntity WHERE Name LIKE '%(COM%'");
-
-            foreach (ManagementObject obj in searcher.Get())
-            {
-                var name = obj["Name"]?.ToString();   // "USB-SERIAL CH340 (COM3)"
-                var deviceId = obj["DeviceID"]?.ToString();
-
-                if (name == null) continue;
-
-
-                // COM 포트 번호 추출
-                var match = Regex.Match(name, @"\(COM\d+\)");
-                if (match.Success)
-                {
-                    ComPortItem ci = new ComPortItem();
-                    var comPort = match.Value.Trim('(', ')').Trim();
-                    var deviceName = name.Replace(match.Value, "").Trim();
-                    var display = $"{comPort} : {deviceName}";
-                    ci.Name = name;
-                    ci.ComPort = comPort;
-                    ci.Display = display;
-                    ports.Add(ci);
-                }
-            }
-
-
-            cmbUsbList.Items.Clear();
-
-            foreach (var ci in ports)
-            {
-                // 표시: "USB-SERIAL CH340 (COM3)"
-                // 실제 사용: "COM3"
-                cmbUsbList.Items.Add(new ComPortItem
-                {
-                    ComPort = ci.ComPort,
-                    Name = ci.Name,
-                    Display = ci.Display
-                });
-            }
-
-            cmbUsbList.DisplayMember = "Display";
-            cmbUsbList.ValueMember = "ComPort";
-        }
-
-
 
         protected override void OnShown(EventArgs e)
         {
@@ -193,224 +69,22 @@ namespace DiffuserController
             Close();
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
+        protected override void OnFormClosing(FormClosingEventArgs e)
         {
-            lbTime.Text = $"{DateTime.Now.ToString("yy-MM-dd (ddd) HH:mm:ss")}";
-            if (dtToday.Day != DateTime.Now.Day)
+            if (!_isRealClose)
             {
-                SettingTargetDatetime();
-                dtToday = DateTime.Now;
-            }
-
-            DateModel dm = LocalDbManager.Instance.Dates.FirstOrDefault(x => x.Date == DateOnly.FromDateTime(DateTime.Now));
-            if (dm == null)
-            {//동작해야 하는 날
-                if (IsRunning)
-                {
-                    DateTime? target = lstTargetDatetime.Where(x => x >= DateTime.Now).FirstOrDefault();
-                    if (target != DateTime.MinValue)
-                    {
-                        TimeSpan ts = target.Value - DateTime.Now;
-                        if (ts.Hours > 0)
-                            lbLeft.Text = $"{ts.Hours}시간 {ts.Minutes}분 {ts.Seconds}초 뒤 {dtTermInterval.Value}초간 분사 예정..";
-                        else if (ts.Minutes > 0)
-                            lbLeft.Text = $"{ts.Minutes}분 {ts.Seconds}초 뒤 {dtTermInterval.Value}초간 분사 예정..";
-                        else if (ts.Seconds > 0)
-                            lbLeft.Text = $"{ts.Seconds}초 뒤 {dtTermInterval.Value}초간 분사 예정..";
-                        else
-                        {
-                            if (rbInterval.Checked)
-                                runningSec = (int)dtTermInterval.Value;
-                            else
-                                runningSec = (int)dtTermSchedule.Value;
-                            runningTimer.Enabled = true;
-                            runningTimer.Start();
-                            btnOn_Click(null, null);
-                        }
-                    }
-                    else
-                    {
-                        lbLeft.Text = $"오늘 동작 일정 종료";
-                    }
-                }
-                else
-                {
-                    lbLeft.Text = $"중지됨";
-                }
+                e.Cancel = true;
+                Hide();
             }
             else
             {
-                lbLeft.Text = $"오늘은 동작 제외 날짜 입니다. ( {dm.Message} )";
+                notifyIcon1.Dispose();
             }
-
-
-            //1시간 2분 4초 뒤 5초간 분사 예정..
-            //분사 중... 남은 시간( 3초 )
-            //[yy-MM-dd HH:mm:ss]
+            base.OnFormClosing(e);
         }
+        #endregion
 
-        private void InitGrid()
-        {
-            grid.AutoGenerateColumns = false;
-            grid.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            grid.EnableHeadersVisualStyles = false;  // ← 추가
-
-            grid.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
-            grid.ColumnHeadersHeight = 32;  // 원하는 높이로 조절
-
-
-            var headerStyle = grid.ColumnHeadersDefaultCellStyle;
-            headerStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            headerStyle.BackColor = SystemColors.Control;
-            headerStyle.ForeColor = SystemColors.ControlText;
-            headerStyle.SelectionBackColor = headerStyle.BackColor;
-            headerStyle.SelectionForeColor = headerStyle.ForeColor;
-
-            foreach (DataGridViewColumn col in grid.Columns)
-            {
-                col.SortMode = DataGridViewColumnSortMode.NotSortable;
-            }
-
-            grid.DataError += DataGridView1_DataError;
-            grid.CurrentCellDirtyStateChanged += Grid_CurrentCellDirtyStateChanged;
-
-            grid.DefaultCellStyle.SelectionBackColor = Color.FromArgb(229, 243, 255);
-            grid.DefaultCellStyle.SelectionForeColor = Color.FromArgb(30, 30, 30);
-            SetupHeaderCheckBox();
-            grid.CellContentDoubleClick += Grid_CellContentDoubleClick;
-            grid.CellBeginEdit += Grid_CellBeginEdit;
-        }
-
-        private void Grid_CellBeginEdit(object? sender, DataGridViewCellCancelEventArgs e)
-        {
-            // 체크박스 컬럼이 아니면 편집 진입 차단
-            if (e.ColumnIndex != Column1.Index)
-            {
-                e.Cancel = true;
-            }
-        }
-
-        private void Grid_CellContentDoubleClick(object? sender, DataGridViewCellEventArgs e)
-        {
-            if (e.RowIndex < 0) return;  // 헤더 더블클릭 방지
-
-            DateModel selectedModel = (DateModel)grid.Rows[e.RowIndex].DataBoundItem;
-            if (selectedModel != null)
-            {
-                monthCalendar1.SetDate(selectedModel.Date.ToDateTime(TimeOnly.MinValue));
-            }
-        }
-
-        private void SetupHeaderCheckBox()
-        {
-            _headerCheckBox = new CheckBox
-            {
-                Size = new Size(14, 14),
-                BackColor = Color.Transparent,
-                Padding = Padding.Empty,
-                Margin = Padding.Empty,
-                ThreeState = true
-            };
-
-            grid.Controls.Add(_headerCheckBox);
-            PositionHeaderCheckBox();
-
-            _headerCheckBox.CheckedChanged += HeaderCheckBox_CheckedChanged;
-            grid.Scroll += (s, e) => PositionHeaderCheckBox();
-            grid.ColumnWidthChanged += (s, e) => PositionHeaderCheckBox();
-            grid.CellValueChanged += Grid_CellValueChanged;
-            grid.RowsAdded += (s, e) => UpdateHeaderCheckBoxState();
-            grid.RowsRemoved += (s, e) => UpdateHeaderCheckBoxState();
-        }
-
-        private void PositionHeaderCheckBox()
-        {
-            var rect = grid.GetCellDisplayRectangle(Column1.Index, -1, true);
-            _headerCheckBox.Location = new Point(
-                rect.Left + (rect.Width - _headerCheckBox.Width) / 2,
-                rect.Top + (rect.Height - _headerCheckBox.Height) / 2
-            );
-        }
-
-        private void HeaderCheckBox_CheckedChanged(object? sender, EventArgs e)
-        {
-            if (_syncingCheckState) return;
-
-            _syncingCheckState = true;
-            try
-            {
-                foreach (DataGridViewRow row in grid.Rows)
-                {
-                    row.Cells[Column1.Index].Value = _headerCheckBox.Checked;
-                }
-            }
-            finally
-            {
-                _syncingCheckState = false;
-            }
-        }
-
-        private void Grid_CellValueChanged(object? sender, DataGridViewCellEventArgs e)
-        {
-            if (_syncingCheckState) return;
-            if (e.RowIndex < 0) return;
-            if (e.ColumnIndex != Column1.Index) return;
-
-            UpdateHeaderCheckBoxState();
-        }
-
-        private void UpdateHeaderCheckBoxState()
-        {
-            int total = grid.Rows.Count;
-            int checkedCount = grid.Rows.Cast<DataGridViewRow>()
-                .Count(r => Convert.ToBoolean(r.Cells[Column1.Index].Value));
-
-            CheckState state = checkedCount == 0 ? CheckState.Unchecked
-                             : checkedCount == total ? CheckState.Checked
-                             : CheckState.Indeterminate;
-
-            _syncingCheckState = true;
-            try { _headerCheckBox.CheckState = state; }
-            finally { _syncingCheckState = false; }
-        }
-
-
-
-        private void SetHeaderCheckedSilently(bool isChecked)
-        {
-            _syncingCheckState = true;
-            try { _headerCheckBox.Checked = isChecked; }
-            finally { _syncingCheckState = false; }
-        }
-
-        private void Grid_CurrentCellDirtyStateChanged(object? sender, EventArgs e)
-        {
-            if (grid.CurrentCell is DataGridViewCheckBoxCell)
-                grid.CommitEdit(DataGridViewDataErrorContexts.Commit);
-        }
-
-        private void DataGridView1_DataError(object? sender, DataGridViewDataErrorEventArgs e)
-        {
-
-        }
-
-        private void InitLoadData()
-        {
-            dateModelBindingSource.DataSource = LocalDbManager.Instance.Dates;
-            grid.Refresh();
-        }
-
-        private void monthCalendar1_DateChanged(object sender, DateRangeEventArgs e)
-        {
-            txtDt.Text = monthCalendar1.SelectionStart.ToString("yyyy-MM-dd (ddd)");
-            txtMessage.Text = LocalDbManager.Instance.GetMessage(monthCalendar1.SelectionStart);
-        }
-
-        private void panel2_Paint(object sender, PaintEventArgs e)
-        {
-
-        }
-
+        #region 버튼 이벤트
         private void btnRange_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(txtMessage.Text))
@@ -430,31 +104,7 @@ namespace DiffuserController
                 }
             }
         }
-
-        private void ContinueSave(DateTime selectionStart, DateTime endDate, string text)
-        {
-            DateTime dt = selectionStart;
-            while (true)
-            {
-                if (dt.Date > endDate.Date)
-                    break;
-                var find = LocalDbManager.Instance.Dates.FirstOrDefault(x => x.Date == DateOnly.FromDateTime(dt.Date));
-                if (find != null)
-                {
-                    find.Message = text;
-                }
-                else
-                {
-                    DateModel dm = new DateModel();
-                    dm.Date = DateOnly.FromDateTime(dt);
-                    dm.Message = text;
-                    LocalDbManager.Instance.Dates.Add(dm);
-                }
-                dt = dt.AddDays(1);
-            }
-            LocalDbManager.Instance.Save();
-        }
-
+        
         private void btnApply_Click(object sender, EventArgs e)
         {
             var find = LocalDbManager.Instance.Dates.FirstOrDefault(x => x.Date == DateOnly.FromDateTime(monthCalendar1.SelectionStart.Date));
@@ -469,6 +119,29 @@ namespace DiffuserController
                 dm.Message = txtMessage.Text;
                 LocalDbManager.Instance.Dates.Add(dm);
             }
+            LocalDbManager.Instance.Save();
+        }
+
+        private async void btnHoliDay_Click(object sender, EventArgs e)
+        {
+            var holidays = await HolidayApi.GetHolidaysAsync((int)defYear.Value);
+
+            foreach (var h in holidays)
+            {
+                DateModel dm = new DateModel();
+                dm.Date = h.Date;
+                dm.Message = h.DateName;
+                var find = LocalDbManager.Instance.Dates.FirstOrDefault(x => x.Date == dm.Date);
+                if (find != null)
+                {
+                    find.Message = dm.Message;
+                }
+                else
+                {
+                    LocalDbManager.Instance.Dates.Add(dm);
+                }
+            }
+
             LocalDbManager.Instance.Save();
         }
 
@@ -579,29 +252,6 @@ namespace DiffuserController
             LocalDbManager.Instance.Save();
         }
 
-        private async void btnHoliDay_Click(object sender, EventArgs e)
-        {
-            var holidays = await HolidayApi.GetHolidaysAsync((int)defYear.Value);
-
-            foreach (var h in holidays)
-            {
-                DateModel dm = new DateModel();
-                dm.Date = h.Date;
-                dm.Message = h.DateName;
-                var find = LocalDbManager.Instance.Dates.FirstOrDefault(x => x.Date == dm.Date);
-                if (find != null)
-                {
-                    find.Message = dm.Message;
-                }
-                else
-                {
-                    LocalDbManager.Instance.Dates.Add(dm);
-                }
-            }
-
-            LocalDbManager.Instance.Save();
-        }
-
         private void radioButton1_CheckedChanged(object sender, EventArgs e)
         {
             plInterval.Visible = true;
@@ -616,6 +266,39 @@ namespace DiffuserController
             SaveSetting();
         }
 
+        private void button1_Click(object sender, EventArgs e)
+        {
+            LoadUSB();
+            FindUsb();
+        }
+
+        private void btnOn_Click(object sender, EventArgs e)
+        {
+            _port?.Write(new byte[] { 0xA0, 0x01, 0x01, 0xA2 }, 0, 4);
+        }
+
+        private void btnOff_Click(object sender, EventArgs e)
+        {
+            _port?.Write(new byte[] { 0xA0, 0x01, 0x00, 0xA1 }, 0, 4);
+        }
+
+        private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            열기ToolStripMenuItem1_Click(null, null);
+        }
+
+        private void 열기ToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            Show();
+            WindowState = FormWindowState.Normal;
+            BringToFront();
+        }
+
+        private void 종료ToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            RealClose();
+        }
+
         private void btnScAdd_Click(object sender, EventArgs e)
         {
             using (frmPopupScAdd frm = new frmPopupScAdd())
@@ -623,16 +306,6 @@ namespace DiffuserController
                 frm.AddTimeEvent += Frm_AddTimeEvent;
                 frm.StartPosition = FormStartPosition.CenterParent;
                 frm.ShowDialog(this);
-            }
-        }
-
-        private void Frm_AddTimeEvent(object? sender, DateTime e)
-        {
-            string val = e.ToString("HH:mm");
-            if (lstBox.Items.Contains(val) == false)
-            {
-                lstBox.Items.Add(val);
-                SaveSetting();
             }
         }
 
@@ -652,6 +325,182 @@ namespace DiffuserController
                 }
                 SaveSetting();
             }
+        }
+
+        private void btnRun_Click(object sender, EventArgs e)
+        {
+            IsRunning = true;
+            btnRun1.Enabled = btnRun2.Enabled = !IsRunning;
+            btnStop1.Enabled = btnStop2.Enabled = IsRunning;
+            SaveSetting();
+            SettingTargetDatetime();
+            SetEnabled();
+        }
+
+        private void btnStop_Click(object sender, EventArgs e)
+        {
+            IsRunning = false;
+            btnRun1.Enabled = btnRun2.Enabled = !IsRunning;
+            btnStop1.Enabled = btnStop2.Enabled = IsRunning;
+            SaveSetting();
+            SetEnabled();
+        }
+        #endregion
+
+        #region 기타 이벤트 
+        private void ValueChanged(object sender, EventArgs e)
+        {
+            SaveSetting();
+        }
+
+        private void cmbUsbList_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            SaveSetting();
+            ComPortItem ci = cmbUsbList.SelectedItem as ComPortItem;
+            if (ci != null)
+            {
+                _port = new SerialPort(ci.ComPort, 9600);
+                _port.Open();
+            }
+        }
+
+        private void dtStartH_ValueChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void runningTimer_Tick(object sender, EventArgs e)
+        {
+            if (runningSec == 0)
+            {
+                lbRunning.Text = "";
+                btnOff_Click(null, null);
+                runningTimer.Stop();
+                runningTimer.Enabled = false;
+            }
+            else
+            {
+                lbRunning.Text = $" ( 분사 중... 남은 시간: {runningSec}초 )";
+                runningSec--;
+            }
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            lbTime.Text = $"{DateTime.Now.ToString("yy-MM-dd (ddd) HH:mm:ss")}";
+            if (dtToday.Day != DateTime.Now.Day)
+            {
+                SettingTargetDatetime();
+                dtToday = DateTime.Now;
+            }
+
+            DateModel dm = LocalDbManager.Instance.Dates.FirstOrDefault(x => x.Date == DateOnly.FromDateTime(DateTime.Now));
+            if (dm == null)
+            {//동작해야 하는 날
+                if (IsRunning)
+                {
+                    DateTime? target = lstTargetDatetime.Where(x => x >= DateTime.Now).FirstOrDefault();
+                    if (target != DateTime.MinValue)
+                    {
+                        TimeSpan ts = target.Value - DateTime.Now;
+                        if (ts.Hours > 0)
+                            lbLeft.Text = $"{ts.Hours}시간 {ts.Minutes}분 {ts.Seconds}초 뒤 {dtTermInterval.Value}초간 분사 예정..";
+                        else if (ts.Minutes > 0)
+                            lbLeft.Text = $"{ts.Minutes}분 {ts.Seconds}초 뒤 {dtTermInterval.Value}초간 분사 예정..";
+                        else if (ts.Seconds > 0)
+                            lbLeft.Text = $"{ts.Seconds}초 뒤 {dtTermInterval.Value}초간 분사 예정..";
+                        else
+                        {
+                            if (rbInterval.Checked)
+                                runningSec = (int)dtTermInterval.Value;
+                            else
+                                runningSec = (int)dtTermSchedule.Value;
+                            runningTimer.Enabled = true;
+                            runningTimer.Start();
+                            btnOn_Click(null, null);
+                        }
+                    }
+                    else
+                    {
+                        lbLeft.Text = $"오늘 동작 일정 종료";
+                    }
+                }
+                else
+                {
+                    lbLeft.Text = $"중지됨";
+                }
+            }
+            else
+            {
+                lbLeft.Text = $"오늘은 동작 제외 날짜 입니다. ( {dm.Message} )";
+            }
+
+
+            //1시간 2분 4초 뒤 5초간 분사 예정..
+            //분사 중... 남은 시간( 3초 )
+            //[yy-MM-dd HH:mm:ss]
+        }
+
+        private void monthCalendar1_DateChanged(object sender, DateRangeEventArgs e)
+        {
+            txtDt.Text = monthCalendar1.SelectionStart.ToString("yyyy-MM-dd (ddd)");
+            txtMessage.Text = LocalDbManager.Instance.GetMessage(monthCalendar1.SelectionStart);
+        }
+
+        private void panel2_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+        #endregion
+
+        #region 제어 메서드
+        private void LoadUSB()
+        {
+            List<ComPortItem> ports = new List<ComPortItem>();
+
+            using var searcher = new ManagementObjectSearcher(
+                "SELECT Name, DeviceID FROM Win32_PnPEntity WHERE Name LIKE '%(COM%'");
+
+            foreach (ManagementObject obj in searcher.Get())
+            {
+                var name = obj["Name"]?.ToString();   // "USB-SERIAL CH340 (COM3)"
+    var deviceId = obj["DeviceID"]?.ToString();
+
+                if (name == null) continue;
+
+
+                // COM 포트 번호 추출
+                var match = Regex.Match(name, @"\(COM\d+\)");
+                if (match.Success)
+                {
+                    ComPortItem ci = new ComPortItem();
+    var comPort = match.Value.Trim('(', ')').Trim();
+    var deviceName = name.Replace(match.Value, "").Trim();
+    var display = $"{comPort} : {deviceName}";
+    ci.Name = name;
+                    ci.ComPort = comPort;
+                    ci.Display = display;
+                    ports.Add(ci);
+                }
+            }
+
+
+            cmbUsbList.Items.Clear();
+
+foreach (var ci in ports)
+{
+    // 표시: "USB-SERIAL CH340 (COM3)"
+    // 실제 사용: "COM3"
+    cmbUsbList.Items.Add(new ComPortItem
+    {
+        ComPort = ci.ComPort,
+        Name = ci.Name,
+        Display = ci.Display
+    });
+}
+
+cmbUsbList.DisplayMember = "Display";
+cmbUsbList.ValueMember = "ComPort";
         }
 
         private void SetEnabled()
@@ -674,35 +523,6 @@ namespace DiffuserController
             lstControl.Add(btnDel);
             lstControl.Add(dtTermInterval);
             lstControl.ForEach(x => x.Enabled = !IsRunning);
-        }
-        private void btnRun_Click(object sender, EventArgs e)
-        {
-            IsRunning = true;
-            btnRun1.Enabled = btnRun2.Enabled = !IsRunning;
-            btnStop1.Enabled = btnStop2.Enabled = IsRunning;
-            SaveSetting();
-            SettingTargetDatetime();
-            SetEnabled();
-        }
-
-        private void btnStop_Click(object sender, EventArgs e)
-        {
-            IsRunning = false;
-            btnRun1.Enabled = btnRun2.Enabled = !IsRunning;
-            btnStop1.Enabled = btnStop2.Enabled = IsRunning;
-            SaveSetting();
-            SetEnabled();
-        }
-
-        private void cmbUsbList_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            SaveSetting();
-            ComPortItem ci = cmbUsbList.SelectedItem as ComPortItem;
-            if (ci != null)
-            {
-                _port = new SerialPort(ci.ComPort, 9600);
-                _port.Open();
-            }
         }
 
         private void SaveSetting()
@@ -813,47 +633,116 @@ namespace DiffuserController
             }
         }
 
-        private void ValueChanged(object sender, EventArgs e)
+        private void ContinueSave(DateTime selectionStart, DateTime endDate, string text)
         {
-            SaveSetting();
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            LoadUSB();
-            FindUsb();
-        }
-
-        private void btnOn_Click(object sender, EventArgs e)
-        {
-            _port?.Write(new byte[] { 0xA0, 0x01, 0x01, 0xA2 }, 0, 4);
-        }
-
-        private void btnOff_Click(object sender, EventArgs e)
-        {
-            _port?.Write(new byte[] { 0xA0, 0x01, 0x00, 0xA1 }, 0, 4);
-        }
-
-        private void dtStartH_ValueChanged(object sender, EventArgs e)
-        {
-
-        }
-
-
-        private void runningTimer_Tick(object sender, EventArgs e)
-        {
-            if (runningSec == 0)
+            DateTime dt = selectionStart;
+            while (true)
             {
-                lbRunning.Text = "";
-                btnOff_Click(null, null);
-                runningTimer.Stop();
-                runningTimer.Enabled = false;
+                if (dt.Date > endDate.Date)
+                    break;
+                var find = LocalDbManager.Instance.Dates.FirstOrDefault(x => x.Date == DateOnly.FromDateTime(dt.Date));
+                if (find != null)
+                {
+                    find.Message = text;
+                }
+                else
+                {
+                    DateModel dm = new DateModel();
+                    dm.Date = DateOnly.FromDateTime(dt);
+                    dm.Message = text;
+                    LocalDbManager.Instance.Dates.Add(dm);
+                }
+                dt = dt.AddDays(1);
             }
-            else
+            LocalDbManager.Instance.Save();
+        }
+
+        private void Frm_AddTimeEvent(object? sender, DateTime e)
+        {
+            string val = e.ToString("HH:mm");
+            if (lstBox.Items.Contains(val) == false)
             {
-                lbRunning.Text = $" ( 분사 중... 남은 시간: {runningSec}초 )";
-                runningSec--;
+                lstBox.Items.Add(val);
+                SaveSetting();
             }
+        }
+        #endregion
+
+        #region 기타 메서드
+        private void RegistOnString()
+        {
+            try
+            {
+                string exePath = Application.ExecutablePath;
+                string taskName = "DiffuserController";
+
+                string xml = $@"<?xml version=""1.0"" encoding=""UTF-16""?>
+<Task version=""1.2"" xmlns=""http://schemas.microsoft.com/windows/2004/02/mit/task"">
+  <RegistrationInfo>
+    <Description>디퓨저 제어기</Description>
+  </RegistrationInfo>
+  <Triggers>
+    <BootTrigger>
+      <Enabled>true</Enabled>
+    </BootTrigger>
+  </Triggers>
+  <Settings>
+    <MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy>
+    <DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries>
+    <StopIfGoingOnBatteries>false</StopIfGoingOnBatteries>
+    <ExecutionTimeLimit>PT0S</ExecutionTimeLimit>
+    <RestartOnFailure>
+      <Interval>PT10M</Interval>
+      <Count>100</Count>
+    </RestartOnFailure>
+  </Settings>
+  <Actions>
+    <Exec>
+      <Command>{exePath}</Command>
+    </Exec>
+  </Actions>
+  <Principals>
+    <Principal>
+      <LogonType>InteractiveToken</LogonType>
+      <RunLevel>HighestAvailable</RunLevel>
+    </Principal>
+  </Principals>
+</Task>";
+
+                // XML 임시 파일로 저장
+                string xmlPath = Path.Combine(Path.GetTempPath(), "relay_task.xml");
+                File.WriteAllText(xmlPath, xml, System.Text.Encoding.Unicode);
+
+                // schtasks로 등록
+                var psi = new ProcessStartInfo
+                {
+                    FileName = "schtasks.exe",
+                    Arguments = $"/Create /TN \"{taskName}\" /XML \"{xmlPath}\" /F",
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true
+                };
+
+                using var process = Process.Start(psi);
+                process!.WaitForExit();
+
+                File.Delete(xmlPath);
+
+                if (process.ExitCode != 0)
+                    MessageBox.Show("등록 실패. 관리자 권한으로 실행해주세요.", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"오류: {ex.Message}", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void SetFormPosition()
+        {
+            var screen = Screen.PrimaryScreen.WorkingArea; // 작업표시줄 제외한 영역
+            Left = screen.Right - Width + 10;   // 우측 여백 10px
+            Top = screen.Bottom - Height + 10;  // 하단 여백 10px
         }
 
         private void RealClose()
@@ -861,37 +750,151 @@ namespace DiffuserController
             _isRealClose = true;
             Application.Exit();
         }
+        #endregion
 
-        protected override void OnFormClosing(FormClosingEventArgs e)
+        #region 그리드 관련
+        private void InitGrid()
         {
-            if (!_isRealClose)
+            grid.AutoGenerateColumns = false;
+            grid.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            grid.EnableHeadersVisualStyles = false;  // ← 추가
+
+            grid.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
+            grid.ColumnHeadersHeight = 32;  // 원하는 높이로 조절
+
+
+            var headerStyle = grid.ColumnHeadersDefaultCellStyle;
+            headerStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            headerStyle.BackColor = SystemColors.Control;
+            headerStyle.ForeColor = SystemColors.ControlText;
+            headerStyle.SelectionBackColor = headerStyle.BackColor;
+            headerStyle.SelectionForeColor = headerStyle.ForeColor;
+
+            foreach (DataGridViewColumn col in grid.Columns)
+            {
+                col.SortMode = DataGridViewColumnSortMode.NotSortable;
+            }
+
+            grid.DataError += DataGridView1_DataError;
+            grid.CurrentCellDirtyStateChanged += Grid_CurrentCellDirtyStateChanged;
+
+            grid.DefaultCellStyle.SelectionBackColor = Color.FromArgb(229, 243, 255);
+            grid.DefaultCellStyle.SelectionForeColor = Color.FromArgb(30, 30, 30);
+            SetupHeaderCheckBox();
+            grid.CellContentDoubleClick += Grid_CellContentDoubleClick;
+            grid.CellBeginEdit += Grid_CellBeginEdit;
+        }
+
+        private void InitLoadData()
+        {
+            dateModelBindingSource.DataSource = LocalDbManager.Instance.Dates;
+            grid.Refresh();
+        }
+
+        private void Grid_CellBeginEdit(object? sender, DataGridViewCellCancelEventArgs e)
+        {
+            // 체크박스 컬럼이 아니면 편집 진입 차단
+            if (e.ColumnIndex != Column1.Index)
             {
                 e.Cancel = true;
-                Hide();
             }
-            else
+        }
+
+        private void Grid_CellContentDoubleClick(object? sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0) return;  // 헤더 더블클릭 방지
+
+            DateModel selectedModel = (DateModel)grid.Rows[e.RowIndex].DataBoundItem;
+            if (selectedModel != null)
             {
-                notifyIcon1.Dispose();
+                monthCalendar1.SetDate(selectedModel.Date.ToDateTime(TimeOnly.MinValue));
             }
-            base.OnFormClosing(e);
         }
 
-        private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
+        private void SetupHeaderCheckBox()
         {
-            열기ToolStripMenuItem1_Click(null, null);
+            _headerCheckBox = new CheckBox
+            {
+                Size = new Size(14, 14),
+                BackColor = Color.Transparent,
+                Padding = Padding.Empty,
+                Margin = Padding.Empty,
+                ThreeState = true
+            };
+
+            grid.Controls.Add(_headerCheckBox);
+            PositionHeaderCheckBox();
+
+            _headerCheckBox.CheckedChanged += HeaderCheckBox_CheckedChanged;
+            grid.Scroll += (s, e) => PositionHeaderCheckBox();
+            grid.ColumnWidthChanged += (s, e) => PositionHeaderCheckBox();
+            grid.CellValueChanged += Grid_CellValueChanged;
+            grid.RowsAdded += (s, e) => UpdateHeaderCheckBoxState();
+            grid.RowsRemoved += (s, e) => UpdateHeaderCheckBoxState();
         }
 
-        private void 열기ToolStripMenuItem1_Click(object sender, EventArgs e)
+        private void PositionHeaderCheckBox()
         {
-            Show();
-            WindowState = FormWindowState.Normal;
-            BringToFront();
+            var rect = grid.GetCellDisplayRectangle(Column1.Index, -1, true);
+            _headerCheckBox.Location = new Point(
+                rect.Left + (rect.Width - _headerCheckBox.Width) / 2,
+                rect.Top + (rect.Height - _headerCheckBox.Height) / 2
+            );
         }
 
-        private void 종료ToolStripMenuItem1_Click(object sender, EventArgs e)
+        private void HeaderCheckBox_CheckedChanged(object? sender, EventArgs e)
         {
-            RealClose();
+            if (_syncingCheckState) return;
+
+            _syncingCheckState = true;
+            try
+            {
+                foreach (DataGridViewRow row in grid.Rows)
+                {
+                    row.Cells[Column1.Index].Value = _headerCheckBox.Checked;
+                }
+            }
+            finally
+            {
+                _syncingCheckState = false;
+            }
         }
+
+        private void Grid_CellValueChanged(object? sender, DataGridViewCellEventArgs e)
+        {
+            if (_syncingCheckState) return;
+            if (e.RowIndex < 0) return;
+            if (e.ColumnIndex != Column1.Index) return;
+
+            UpdateHeaderCheckBoxState();
+        }
+
+        private void UpdateHeaderCheckBoxState()
+        {
+            int total = grid.Rows.Count;
+            int checkedCount = grid.Rows.Cast<DataGridViewRow>()
+                .Count(r => Convert.ToBoolean(r.Cells[Column1.Index].Value));
+
+            CheckState state = checkedCount == 0 ? CheckState.Unchecked
+                             : checkedCount == total ? CheckState.Checked
+                             : CheckState.Indeterminate;
+
+            _syncingCheckState = true;
+            try { _headerCheckBox.CheckState = state; }
+            finally { _syncingCheckState = false; }
+        }
+
+        private void Grid_CurrentCellDirtyStateChanged(object? sender, EventArgs e)
+        {
+            if (grid.CurrentCell is DataGridViewCheckBoxCell)
+                grid.CommitEdit(DataGridViewDataErrorContexts.Commit);
+        }
+
+        private void DataGridView1_DataError(object? sender, DataGridViewDataErrorEventArgs e)
+        {
+
+        }
+        #endregion
     }
 
     public static class HolidayApi
