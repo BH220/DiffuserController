@@ -1,0 +1,17 @@
+﻿<Application
+    x:Class="DiffuserControllerNew.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:DiffuserControllerNew">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Resources/Style/Text.xaml" />
+                <ResourceDictionary Source="/Resources/Style/Border.xaml" />
+                <ResourceDictionary Source="/Resources/Style/Button.xaml" />
+                <ResourceDictionary Source="/Resources/Style/GridView.xaml" />
+                <ResourceDictionary Source="/Resources/Style/DateControl.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

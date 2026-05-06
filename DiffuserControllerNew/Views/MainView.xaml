@@ -1,0 +1,70 @@
+﻿<Window
+    x:Class="DiffuserControllerNew.Views.MainView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:DiffuserControllerNew.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:vm="clr-namespace:DiffuserControllerNew.ViewModels"
+    Title="디퓨저 제어기"
+    MinWidth="646"
+    MinHeight="567"
+    d:DataContext="{d:DesignInstance vm:MainViewModel}"
+    Icon="/Resources/main_Icon_512.png"
+    mc:Ignorable="d">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="25" />
+        </Grid.RowDefinitions>
+
+        <TabControl Grid.Row="0">
+            <TabItem Header="제어판">
+                <local:ControlView />
+            </TabItem>
+            <TabItem Header="동작 제외 날짜 구성">
+                <local:IgnoreDateView />
+            </TabItem>
+        </TabControl>
+
+        <StatusBar Grid.Row="1">
+            <StatusBar.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <DockPanel LastChildFill="True" />
+                </ItemsPanelTemplate>
+            </StatusBar.ItemsPanel>
+            <StatusBarItem DockPanel.Dock="Right">
+                <TextBlock Margin="0,0,5,0" Text="{Binding StatusbarUserTimeInfo}" />
+            </StatusBarItem>
+            <StatusBarItem>
+                <TextBlock
+                    Margin="5,0,0,0"
+                    Text="Session expires in"
+                    Visibility="{Binding StatusbarVisible}" />
+            </StatusBarItem>
+            <StatusBarItem>
+                <TextBlock
+                    Margin="0,0,5,0"
+                    Text="{Binding StatusbarSessionTime}"
+                    Visibility="{Binding StatusbarVisible}" />
+            </StatusBarItem>
+            <StatusBarItem>
+                <Border />
+            </StatusBarItem>
+        </StatusBar>
+        <ui:SnackbarPresenter x:Name="SnackbarPresenter" />
+        <!--  오버레이  -->
+        <!--<Grid
+            Grid.RowSpan="2"
+            Background="#60000000"
+            Visibility="{Binding IsModalOpen, Converter={StaticResource BoolToVisibility}}">
+            <Border HorizontalAlignment="Center" VerticalAlignment="Center">
+                <ContentControl Content="{Binding ModalContent}" />
+            </Border>
+        </Grid>-->
+    </Grid>
+</Window>

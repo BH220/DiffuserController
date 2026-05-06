@@ -30,10 +30,10 @@
         {
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
-            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle5 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle6 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle7 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle8 = new DataGridViewCellStyle();
             tabControl1 = new TabControl();
             tabPage1 = new TabPage();
             btnOff = new Button();
@@ -154,7 +154,7 @@
             tabControl1.Location = new Point(0, 0);
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
-            tabControl1.Size = new Size(646, 567);
+            tabControl1.Size = new Size(1020, 567);
             tabControl1.TabIndex = 0;
             // 
             // tabPage1
@@ -171,7 +171,7 @@
             tabPage1.Location = new Point(4, 24);
             tabPage1.Name = "tabPage1";
             tabPage1.Padding = new Padding(3);
-            tabPage1.Size = new Size(638, 539);
+            tabPage1.Size = new Size(1012, 539);
             tabPage1.TabIndex = 0;
             tabPage1.Text = "제어판";
             tabPage1.UseVisualStyleBackColor = true;
@@ -606,7 +606,7 @@
             tabPage2.Location = new Point(4, 24);
             tabPage2.Name = "tabPage2";
             tabPage2.Padding = new Padding(3);
-            tabPage2.Size = new Size(638, 539);
+            tabPage2.Size = new Size(1012, 539);
             tabPage2.TabIndex = 1;
             tabPage2.Text = "동작 제외 날짜 구성";
             tabPage2.UseVisualStyleBackColor = true;
@@ -626,7 +626,7 @@
             grid.Name = "grid";
             grid.RowHeadersVisible = false;
             grid.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            grid.Size = new Size(396, 466);
+            grid.Size = new Size(770, 466);
             grid.TabIndex = 2;
             // 
             // Column1
@@ -648,8 +648,8 @@
             // yearDataGridViewTextBoxColumn
             // 
             yearDataGridViewTextBoxColumn.DataPropertyName = "year";
-            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            yearDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle5.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            yearDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle5;
             yearDataGridViewTextBoxColumn.HeaderText = "년";
             yearDataGridViewTextBoxColumn.Name = "yearDataGridViewTextBoxColumn";
             yearDataGridViewTextBoxColumn.ReadOnly = true;
@@ -658,8 +658,8 @@
             // monthDataGridViewTextBoxColumn
             // 
             monthDataGridViewTextBoxColumn.DataPropertyName = "month";
-            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            monthDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle6.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            monthDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle6;
             monthDataGridViewTextBoxColumn.HeaderText = "월";
             monthDataGridViewTextBoxColumn.Name = "monthDataGridViewTextBoxColumn";
             monthDataGridViewTextBoxColumn.ReadOnly = true;
@@ -668,8 +668,8 @@
             // dayDataGridViewTextBoxColumn
             // 
             dayDataGridViewTextBoxColumn.DataPropertyName = "day";
-            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dayDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle7.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dayDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle7;
             dayDataGridViewTextBoxColumn.HeaderText = "일";
             dayDataGridViewTextBoxColumn.Name = "dayDataGridViewTextBoxColumn";
             dayDataGridViewTextBoxColumn.ReadOnly = true;
@@ -678,8 +678,8 @@
             // dataGridViewTextBoxColumn1
             // 
             dataGridViewTextBoxColumn1.DataPropertyName = "DoW";
-            dataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewTextBoxColumn1.DefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle8.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewTextBoxColumn1.DefaultCellStyle = dataGridViewCellStyle8;
             dataGridViewTextBoxColumn1.HeaderText = "요일";
             dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
             dataGridViewTextBoxColumn1.ReadOnly = true;
@@ -702,7 +702,7 @@
             panel3.Dock = DockStyle.Top;
             panel3.Location = new Point(239, 38);
             panel3.Name = "panel3";
-            panel3.Size = new Size(396, 32);
+            panel3.Size = new Size(770, 32);
             panel3.TabIndex = 4;
             // 
             // btnSelectedDel
@@ -899,7 +899,7 @@
             panel4.Dock = DockStyle.Top;
             panel4.Location = new Point(3, 3);
             panel4.Name = "panel4";
-            panel4.Size = new Size(632, 35);
+            panel4.Size = new Size(1006, 35);
             panel4.TabIndex = 5;
             // 
             // label17
@@ -908,7 +908,7 @@
             label17.Font = new Font("맑은 고딕", 15F);
             label17.Location = new Point(0, 0);
             label17.Name = "label17";
-            label17.Size = new Size(632, 35);
+            label17.Size = new Size(1006, 35);
             label17.TabIndex = 0;
             label17.Text = "이 탭을 통해 등록된 날짜에는 스케줄링이 동작하지 않습니다.";
             // 
@@ -917,7 +917,7 @@
             statusStrip1.Items.AddRange(new ToolStripItem[] { lbLeft, lbRunning, toolStripStatusLabel1, lbTime });
             statusStrip1.Location = new Point(0, 567);
             statusStrip1.Name = "statusStrip1";
-            statusStrip1.Size = new Size(646, 22);
+            statusStrip1.Size = new Size(1020, 22);
             statusStrip1.TabIndex = 1;
             statusStrip1.Text = "statusStrip1";
             // 
@@ -935,7 +935,7 @@
             // 
             toolStripStatusLabel1.Name = "toolStripStatusLabel1";
             toolStripStatusLabel1.Overflow = ToolStripItemOverflow.Always;
-            toolStripStatusLabel1.Size = new Size(631, 17);
+            toolStripStatusLabel1.Size = new Size(1005, 17);
             toolStripStatusLabel1.Spring = true;
             // 
             // lbTime
@@ -990,7 +990,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(646, 589);
+            ClientSize = new Size(1020, 589);
             Controls.Add(tabControl1);
             Controls.Add(statusStrip1);
             FormBorderStyle = FormBorderStyle.FixedSingle;

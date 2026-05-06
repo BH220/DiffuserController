@@ -1,0 +1,149 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
+    <Style x:Key="LeftTitle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Padding" Value="0,0,0,0" />
+        <Setter Property="Foreground" Value="#5A6178" />
+        <Setter Property="VerticalAlignment" Value="Top" />
+    </Style>
+    <Style x:Key="NumberOnly" TargetType="{x:Type ui:NumberBox}">
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Padding" Value="0,0,0,0" />
+        <Setter Property="Foreground" Value="#5A6178" />
+        <Setter Property="VerticalAlignment" Value="Top" />
+    </Style>
+    <Style x:Key="Content" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="Padding" Value="0,0,0,0" />
+        <Setter Property="Foreground" Value="#2E3548" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style x:Key="NotiTitle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="Padding" Value="0,0,0,0" />
+        <Setter Property="Foreground" Value="#2E3548" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style x:Key="LeftSubTitle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Padding" Value="0,0,0,0" />
+        <Setter Property="Foreground" Value="#5A6178" />
+        <Setter Property="VerticalAlignment" Value="Top" />
+    </Style>
+    <Style x:Key="SelectedDate" TargetType="TextBox">
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Padding" Value="0,0,0,0" />
+        <Setter Property="Foreground" Value="#5A6178" />
+        <Setter Property="VerticalAlignment" Value="Top" />
+    </Style>
+    <Style x:Key="SelectedContent" TargetType="TextBox">
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Padding" Value="0,0,0,0" />
+        <Setter Property="Foreground" Value="#5A6178" />
+        <Setter Property="VerticalAlignment" Value="Top" />
+    </Style>
+
+    <Style x:Key="GridTitleLeft" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Padding" Value="0,0,0,0" />
+        <Setter Property="Foreground" Value="#5A6178" />
+        <Setter Property="VerticalAlignment" Value="Top" />
+    </Style>
+
+
+
+
+
+
+
+
+    <Style x:Key="Link" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Padding" Value="0,0,0,0" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Foreground" Value="#519EE8" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style x:Key="title3" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="18" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Padding" Value="10,0,0,0" />
+        <Setter Property="Foreground" Value="#5A6178" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+    <Style x:Key="txt1" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="Padding" Value="0,0,0,0" />
+        <Setter Property="Foreground" Value="#5A6178" />
+    </Style>
+    <Style x:Key="ViewTitle" TargetType="TextBlock">
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="FontSize" Value="20" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="#5A6178" />
+    </Style>
+    <Style x:Key="SubTitle" TargetType="TextBlock">
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="#5A6178" />
+    </Style>
+    <Style x:Key="PopupTitle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Margin" Value="20,0,0,0" />
+    </Style>
+
+    <Style x:Key="txtBlackCenter" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="Padding" Value="0,0,0,0" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Foreground" Value="Black" />
+    </Style>
+
+
+    <Style x:Key="TimeTitle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Padding" Value="0,0,0,0" />
+        <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="Foreground" Value="#374151" />
+    </Style>
+    <Style x:Key="TimeNow" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="25" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Padding" Value="0,0,0,0" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Foreground" Value="#374151" />
+    </Style>
+    <Style x:Key="TimeDate" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="Padding" Value="0,0,0,0" />
+        <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="Foreground" Value="#5A6178" />
+    </Style>
+
+    <Style x:Key="Header" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="Padding" Value="10,0,10,0" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="#252A38" />
+    </Style>
+
+
+    <Style x:Key="Cell" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="Padding" Value="10,0,10,0" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Foreground" Value="#5A6178" />
+    </Style>
+</ResourceDictionary>

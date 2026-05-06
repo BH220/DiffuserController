@@ -37,9 +37,16 @@ namespace DiffuserController
             base.OnLoad(e);
 #if DEBUG
             btnOn.Visible = btnOff.Visible = true;
+            RegistOnControlPanel();
 #else
             RegistOnString();
+            RegistOnControlPanel();
 #endif
+        }
+
+        private void RegistOnControlPanel()
+        {
+            
         }
 
         protected override void OnShown(EventArgs e)
