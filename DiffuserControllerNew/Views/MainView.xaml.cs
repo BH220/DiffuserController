@@ -30,6 +30,9 @@ namespace DiffuserControllerNew.Views
             _provider = provider;
             DataContext = viewModel;
             viewModel.VisibleMenu = "Hidden";
+            ControlViewHost.Content = provider.GetRequiredService<ControlView>();
+            IgnoreDateViewHost.Content = provider.GetRequiredService<IgnoreDateView>();
+
             this.Loaded += MainView_Loaded;
             //this.menuBar.MenuSelected += (menuName) =>
             //{

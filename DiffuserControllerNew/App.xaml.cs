@@ -1,4 +1,5 @@
-﻿using DiffuserControllerNew.Views;
+﻿using DiffuserControllerNew.Common;
+using DiffuserControllerNew.Views;
 using IWshRuntimeLibrary;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32.SafeHandles;
@@ -9,6 +10,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Text;
+using System.Text.Json;
 using System.Windows;
 
 namespace DiffuserControllerNew
@@ -41,6 +43,7 @@ namespace DiffuserControllerNew
         private const uint GENERIC_WRITE = 0x40000000;
         private const uint FILE_SHARE_WRITE = 0x2;
         private const uint OPEN_EXISTING = 0x3;
+        public static string ApiKey { get; private set; } = "";
 
         public App()
         {
@@ -48,6 +51,7 @@ namespace DiffuserControllerNew
             AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
             TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
         }
+
 
         protected override void OnExit(ExitEventArgs e)
         {
@@ -77,13 +81,27 @@ namespace DiffuserControllerNew
             ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
             MakeShortCut();
-              
+
+            // API 키 로드
+            KeyLoad();
 
             // MainWindow 설정 및 수동 Show
             var view = Services.GetRequiredService<MainView>();
             ShowWindow(view);
 
         }
+
+        private static void KeyLoad()
+        {
+            string path = AppDomain.CurrentDomain.BaseDirectory + "appSetting.prod.json";
+            if (System.IO.File.Exists(path))
+            {
+                string json = System.IO.File.ReadAllText(path);
+                AppSettings se = JsonSerializer.Deserialize<AppSettings>(json);
+                App.ApiKey = se.api_key;
+            }
+        }
+
 
         private static void ShowWindow(Window window)
         {

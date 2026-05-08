@@ -3,12 +3,16 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using DiffuserControllerNew.Interface;
 using DiffuserControllerNew.Message;
+using DiffuserControllerNew.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Management;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Interop;
 using System.Windows.Shapes;
 using System.Windows.Threading;
@@ -33,33 +37,24 @@ namespace DiffuserControllerNew.ViewModels
 
         private readonly IServiceProvider _provider;
         private readonly INavigationService _navService;
-        private readonly IMessenger _messenger;
-        //private readonly IUserUpdateViewFactory _userUpdateViewFactory;
-        //private readonly ILoginDuplicateViewFactory _loginDuplicateViewFactory;
-        //private readonly ILogDetailViewFactory _logDetailViewFactory;
+        private readonly IMessenger _messenger; 
 
         private DispatcherTimer _timer;
         private DateTime sessionTimeLeft;
         private readonly DateTime sessionDefDate = new DateTime(2000, 1, 1, 0, 0, 0);
 
 
-        public MainViewModel(MainViewModelConfiguration mainConf,
-            IServiceProvider provider,
-            //IUserUpdateViewFactory userUpdateViewFactory,
-            //ILoginDuplicateViewFactory loginDuplicateViewFactory,
-            //ILogDetailViewFactory logDetailViewFactory,
-            INavigationService navService)
+        public MainViewModel(MainViewModelConfiguration mainConf, IServiceProvider provider, INavigationService navService)
         {
             _provider = provider;
             _navService = navService;
             _messenger = mainConf.Messenger;
-            //_userUpdateViewFactory = userUpdateViewFactory;
-            //_loginDuplicateViewFactory = loginDuplicateViewFactory;
-            //_logDetailViewFactory = logDetailViewFactory;
-
             InitializeMessaging();
             TimerInit();
         }
+
+
+
 
         private void TimerInit()
         {

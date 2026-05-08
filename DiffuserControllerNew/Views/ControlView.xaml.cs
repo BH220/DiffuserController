@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DiffuserControllerNew.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,9 +21,10 @@ namespace DiffuserControllerNew.Views
     /// </summary>
     public partial class ControlView : UserControl
     {
-        public ControlView()
+        public ControlView(ControlViewModel controlViewModel)
         {
             InitializeComponent();
+            this.DataContext = controlViewModel;
         }
     }
 }

@@ -5,16 +5,18 @@
     <Style x:Key="LeftTitle" TargetType="TextBlock">
         <Setter Property="FontSize" Value="13" />
         <Setter Property="FontWeight" Value="Bold" />
-        <Setter Property="Padding" Value="0,0,0,0" />
+        <Setter Property="Padding" Value="10" />
         <Setter Property="Foreground" Value="#5A6178" />
         <Setter Property="VerticalAlignment" Value="Top" />
     </Style>
     <Style x:Key="NumberOnly" TargetType="{x:Type ui:NumberBox}">
         <Setter Property="FontSize" Value="13" />
         <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Height" Value="25" />
         <Setter Property="Padding" Value="0,0,0,0" />
         <Setter Property="Foreground" Value="#5A6178" />
-        <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="TextAlignment" Value="Center" />
     </Style>
     <Style x:Key="Content" TargetType="TextBlock">
         <Setter Property="FontSize" Value="13" />
@@ -24,43 +26,130 @@
     </Style>
     <Style x:Key="NotiTitle" TargetType="TextBlock">
         <Setter Property="FontSize" Value="13" />
-        <Setter Property="Padding" Value="0,0,0,0" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Padding" Value="6" />
+        <Setter Property="Height" Value="Auto" />
         <Setter Property="Foreground" Value="#2E3548" />
+        <Setter Property="Background" Value="#F2F8FF" />
         <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
     <Style x:Key="LeftSubTitle" TargetType="TextBlock">
         <Setter Property="FontSize" Value="13" />
         <Setter Property="FontWeight" Value="Bold" />
-        <Setter Property="Padding" Value="0,0,0,0" />
+        <Setter Property="Height" Value="25" />
+        <Setter Property="Padding" Value="5" />
         <Setter Property="Foreground" Value="#5A6178" />
-        <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
     <Style x:Key="SelectedDate" TargetType="TextBox">
         <Setter Property="FontSize" Value="13" />
         <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="Padding" Value="0,0,0,0" />
         <Setter Property="Foreground" Value="#5A6178" />
-        <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
     <Style x:Key="SelectedContent" TargetType="TextBox">
         <Setter Property="FontSize" Value="13" />
         <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="Padding" Value="0,0,0,0" />
         <Setter Property="Foreground" Value="#5A6178" />
-        <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
     </Style>
 
     <Style x:Key="GridTitleLeft" TargetType="TextBlock">
         <Setter Property="FontSize" Value="13" />
         <Setter Property="FontWeight" Value="Bold" />
-        <Setter Property="Padding" Value="0,0,0,0" />
+        <Setter Property="Padding" Value="20,0,0,0" />
         <Setter Property="Foreground" Value="#5A6178" />
-        <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+    <Style x:Key="ListView" TargetType="ListView">
+        <Setter Property="BorderBrush" Value="#5A6178" />
+        <Setter Property="BorderThickness" Value="1" />
+    </Style>
+
+    <Style x:Key="RadioActionType" TargetType="StackPanel">
+        <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
 
 
+    <Style x:Key="ComboUsb" TargetType="ComboBox">
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="Margin" Value="0,5,0,5" />
+        <Setter Property="Height" Value="27" />
+        <Setter Property="BorderBrush" Value="#ABADB3" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="FontWeight" Value="Regular" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Foreground" Value="#374151" />
+        <Setter Property="Background" Value="White" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ComboBox">
+                    <Grid Width="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}">
 
-
+                        <ToggleButton
+                            x:Name="ToggleButton"
+                            HorizontalAlignment="Stretch"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            ClickMode="Press"
+                            Focusable="False"
+                            IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}">
+                            <ToggleButton.Template>
+                                <ControlTemplate TargetType="ToggleButton">
+                                    <Border
+                                        Background="{TemplateBinding Background}"
+                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                        BorderThickness="{TemplateBinding BorderThickness}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="30" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock
+                                                Grid.Column="1"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                FontSize="10"
+                                                Foreground="#374151"
+                                                Text="∨" />
+                                        </Grid>
+                                    </Border>
+                                </ControlTemplate>
+                            </ToggleButton.Template>
+                        </ToggleButton>
+                        <ContentPresenter
+                            Margin="10,0,30,0"
+                            VerticalAlignment="Center"
+                            Content="{TemplateBinding SelectionBoxItem}"
+                            ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                            IsHitTestVisible="False" />
+                        <Popup
+                            x:Name="PART_Popup"
+                            AllowsTransparency="True"
+                            IsOpen="{TemplateBinding IsDropDownOpen}"
+                            Placement="Bottom"
+                            StaysOpen="False">
+                            <Border
+                                MinWidth="{TemplateBinding ActualWidth}"
+                                Background="White"
+                                BorderBrush="#E5E7EB"
+                                BorderThickness="1">
+                                <ScrollViewer MaxHeight="150">
+                                    <ItemsPresenter />
+                                </ScrollViewer>
+                            </Border>
+                        </Popup>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 
 
 

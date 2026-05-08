@@ -29,7 +29,9 @@
             </Setter.Value>
         </Setter>
     </Style>
-    <Style x:Key="RadioButton" TargetType="RadioButton" />
+    <Style x:Key="RadioButton" TargetType="RadioButton">
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
 
 
     <Style x:Key="BtnFunctionBlue" TargetType="Button">
@@ -39,10 +41,13 @@
         <Setter Property="BorderBrush" Value="#146CBE" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Margin" Value="0,0,7,0" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Foreground" Value="#FFFFFF" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
                     <Border
+                        x:Name="border"
                         Padding="{TemplateBinding Padding}"
                         Background="{TemplateBinding Background}"
                         BorderBrush="{TemplateBinding BorderBrush}"
@@ -50,17 +55,28 @@
                         CornerRadius="3">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#1A73E8" />
+                            <Setter TargetName="border" Property="BorderBrush" Value="#1A73E8" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#0047A3" />
+                            <Setter TargetName="border" Property="BorderBrush" Value="#0047A3" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-        <Setter Property="Foreground" Value="#FFFFFF" />
     </Style>
-    <Style x:Key="BtnFunction" TargetType="Button">
-        <Setter Property="FontSize" Value="13" />
+
+    <Style x:Key="BtnFunction2" TargetType="Button">
+        <Setter Property="FontSize" Value="12" />
         <Setter Property="Padding" Value="0,0,0,0" />
         <Setter Property="Background" Value="White" />
         <Setter Property="BorderBrush" Value="#5A6178" />
         <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Margin" Value="0,0,7,0" />
         <Setter Property="Template">
             <Setter.Value>
@@ -77,6 +93,43 @@
             </Setter.Value>
         </Setter>
         <Setter Property="Foreground" Value="#2E3548" />
+    </Style>
+
+    <Style x:Key="BtnFunction" TargetType="Button">
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="Padding" Value="0,0,0,0" />
+        <Setter Property="Background" Value="White" />
+        <Setter Property="BorderBrush" Value="#5A6178" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Margin" Value="0,0,7,0" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Foreground" Value="#2E3548" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border
+                        x:Name="border"
+                        Padding="{TemplateBinding Padding}"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="3">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#F3F4F6" />
+                            <Setter TargetName="border" Property="BorderBrush" Value="#374151" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#E5E7EB" />
+                            <Setter TargetName="border" Property="BorderBrush" Value="#1F2937" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <Style x:Key="BtnExtend" TargetType="Button">

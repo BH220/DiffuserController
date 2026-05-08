@@ -8,10 +8,11 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:vm="clr-namespace:DiffuserControllerNew.ViewModels"
     Title="디퓨저 제어기"
-    MinWidth="646"
-    MinHeight="567"
+    Width="646"
+    Height="600"
     d:DataContext="{d:DesignInstance vm:MainViewModel}"
     Icon="/Resources/main_Icon_512.png"
+    ResizeMode="NoResize"
     mc:Ignorable="d">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
@@ -24,10 +25,10 @@
 
         <TabControl Grid.Row="0">
             <TabItem Header="제어판">
-                <local:ControlView />
+                <ContentPresenter x:Name="ControlViewHost" />
             </TabItem>
             <TabItem Header="동작 제외 날짜 구성">
-                <local:IgnoreDateView />
+                <ContentPresenter x:Name="IgnoreDateViewHost" />
             </TabItem>
         </TabControl>
 

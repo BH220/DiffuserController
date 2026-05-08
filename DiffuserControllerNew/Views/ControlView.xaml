@@ -8,180 +8,241 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     d:Background="White"
     mc:Ignorable="d">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-        <ui:TextBlock
-            Grid.Row="0"
-            Grid.Column="0"
-            Style="{StaticResource LeftTitle}"
-            Text="대상 USB" />
-        <StackPanel
-            Grid.Row="0"
-            Grid.Column="1"
-            Orientation="Horizontal">
-            <ComboBox Width="200" />
-            <ui:Button Content="새로고침" Style="{StaticResource BtnFunction}" />
-        </StackPanel>
-        <ui:TextBlock
-            Grid.Row="1"
-            Grid.Column="0"
-            Style="{StaticResource LeftTitle}"
-            Text="동작 구분" />
-        <StackPanel
-            Grid.Row="1"
-            Grid.Column="1"
-            Orientation="Horizontal">
-            <RadioButton Content="Interval" Style="{StaticResource RadioButton}" />
-            <RadioButton Content="Schedule" Style="{StaticResource RadioButton}" />
-        </StackPanel>
-        <StackPanel
-            Grid.Row="2"
-            Grid.Column="0"
-            Grid.ColumnSpan="2"
-            Orientation="Horizontal">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
+    <Border Padding="50,30,50,50">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="20" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="20" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="20" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="20" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="50" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="150" />
+                <ColumnDefinition Width="320" />
+            </Grid.ColumnDefinitions>
+
+            <ui:TextBlock
+                Grid.Row="0"
+                Grid.Column="0"
+                Style="{StaticResource LeftTitle}"
+                Text="대상 USB" />
+            <Grid Grid.Row="0" Grid.Column="1">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <ui:TextBlock
-                    Grid.Row="0"
+                <ComboBox
                     Grid.Column="0"
-                    Style="{StaticResource GridTitleLeft}"
-                    Text="시작 시간" />
-
-                <StackPanel
-                    Grid.Row="0"
+                    Height="32"
+                    Padding="10,6,10,6"
+                    HorizontalAlignment="Stretch"
+                    BorderBrush="#ABADB3"
+                    DisplayMemberPath="Display"
+                    ItemsSource="{Binding UsbItems}"
+                    SelectedIndex="{Binding UsbSelectedIndex, Mode=TwoWay}" />
+                <ui:Button
                     Grid.Column="1"
-                    Orientation="Horizontal">
-                    <ui:NumberBox Width="80" Style="{StaticResource NumberOnly}" />
-                    <ui:TextBlock Style="{StaticResource Content}" Text=":" />
-                    <ui:NumberBox Width="80" Style="{StaticResource NumberOnly}" />
-                </StackPanel>
-                <ui:TextBlock
-                    Grid.Row="1"
-                    Grid.Column="0"
-                    Style="{StaticResource GridTitleLeft}"
-                    Text="종료 시간" />
-
-                <StackPanel
-                    Grid.Row="1"
-                    Grid.Column="1"
-                    Orientation="Horizontal">
-                    <ui:NumberBox Width="80" Style="{StaticResource NumberOnly}" />
-                    <ui:TextBlock Style="{StaticResource Content}" Text=":" />
-                    <ui:NumberBox Width="80" Style="{StaticResource NumberOnly}" />
-                </StackPanel>
-                <ui:TextBlock
-                    Grid.Row="2"
-                    Grid.Column="0"
-                    Style="{StaticResource GridTitleLeft}"
-                    Text="간격" />
-
-                <StackPanel
-                    Grid.Row="2"
-                    Grid.Column="1"
-                    Orientation="Horizontal">
-                    <ui:NumberBox Width="80" Style="{StaticResource NumberOnly}" />
-                    <ui:TextBlock Style="{StaticResource Content}" Text=":" />
-                    <ui:NumberBox Width="80" Style="{StaticResource NumberOnly}" />
-                    <ui:TextBlock Style="{StaticResource Content}" Text=":" />
-                    <ui:NumberBox Width="80" Style="{StaticResource NumberOnly}" />
-                </StackPanel>
-                <ui:TextBlock
-                    Grid.Row="3"
-                    Grid.Column="0"
-                    Style="{StaticResource GridTitleLeft}"
-                    Text="분사 유지 시간" />
-
-                <StackPanel
-                    Grid.Row="3"
-                    Grid.Column="1"
-                    Orientation="Horizontal">
-                    <ui:NumberBox Width="80" Style="{StaticResource NumberOnly}" />
-                    <ui:TextBlock Style="{StaticResource Content}" Text="초" />
-                </StackPanel>
-                <StackPanel
-                    Grid.Row="4"
-                    Grid.Column="1"
-                    Orientation="Horizontal">
-                    <ui:Button Content="설정" Style="{StaticResource BtnFunctionBlue}" />
-                    <ui:Button Content="설정" Style="{StaticResource BtnFunctionBlue}" />
-                </StackPanel>
+                    Width="80"
+                    Height="30"
+                    Margin="10,0,0,0"
+                    Content="새로고침"
+                    Style="{StaticResource BtnFunction}" />
             </Grid>
+            <ui:TextBlock
+                Grid.Row="2"
+                Grid.Column="0"
+                Style="{StaticResource LeftTitle}"
+                Text="동작 구분" />
+            <StackPanel
+                Grid.Row="2"
+                Grid.Column="1"
+                Orientation="Horizontal"
+                Style="{StaticResource RadioActionType}">
+                <RadioButton
+                    Margin="0,0,0,0"
+                    Content="Interval"
+                    IsChecked="{Binding RbInterval, Mode=TwoWay}"
+                    Style="{StaticResource RadioButton}" />
+                <RadioButton
+                    Margin="10,0,0,0"
+                    Content="Schedule"
+                    IsChecked="{Binding RbSchedule, Mode=TwoWay}"
+                    Style="{StaticResource RadioButton}" />
+            </StackPanel>
+            <StackPanel
+                Grid.Row="4"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                Orientation="Horizontal">
+                <Grid Visibility="{Binding VisibleInterval}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="20" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="20" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="150" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <ui:TextBlock
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        Style="{StaticResource GridTitleLeft}"
+                        Text="시작 시간" />
 
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <ui:TextBlock
-                    Grid.Row="0"
-                    Grid.Column="0"
-                    Style="{StaticResource GridTitleLeft}"
-                    Text="시작 시간" />
-
-                <StackPanel
-                    Grid.Row="0"
-                    Grid.Column="1"
-                    Orientation="Horizontal">
-
-                    <ui:ListView Width="80" Height="150" />
-                    <StackPanel Orientation="Vertical">
-                        <ui:Button Content="추가" Style="{StaticResource BtnFunctionBlue}" />
-                        <ui:Button Content="추가" Style="{StaticResource BtnFunctionBlue}" />
+                    <StackPanel
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        Orientation="Horizontal">
+                        <ui:NumberBox
+                            Width="40"
+                            Style="{StaticResource NumberOnly}"
+                            Value="{Binding DtStartH}" />
+                        <ui:TextBlock Style="{StaticResource Content}" Text=" : " />
+                        <ui:NumberBox
+                            Width="40"
+                            Style="{StaticResource NumberOnly}"
+                            Value="{Binding DtStartM}" />
                     </StackPanel>
-                </StackPanel>
-                <ui:TextBlock
-                    Grid.Row="1"
-                    Grid.Column="0"
-                    Style="{StaticResource GridTitleLeft}"
-                    Text="분사 유지 시간" />
+                    <ui:TextBlock
+                        Grid.Row="2"
+                        Grid.Column="0"
+                        Style="{StaticResource GridTitleLeft}"
+                        Text="종료 시간" />
 
-                <StackPanel
-                    Grid.Row="1"
-                    Grid.Column="1"
-                    Orientation="Horizontal">
-                    <ui:NumberBox Width="80" Style="{StaticResource NumberOnly}" />
-                    <ui:TextBlock Style="{StaticResource Content}" Text="초" />
-                </StackPanel>
-                <StackPanel
-                    Grid.Row="2"
-                    Grid.Column="1"
-                    Orientation="Horizontal">
-                    <ui:Button Content="설정" Style="{StaticResource BtnFunctionBlue}" />
-                    <ui:Button Content="설정" Style="{StaticResource BtnFunctionBlue}" />
-                </StackPanel>
-            </Grid>
-        </StackPanel>
-        <StackPanel
-            Grid.Row="3"
-            Grid.Column="0"
-            Grid.ColumnSpan="2"
-            Orientation="Horizontal">
-            <ui:Button Content="새로고침" Style="{StaticResource BtnFunction}" />
-            <ui:Button Content="새로고침" Style="{StaticResource BtnFunction}" />
-        </StackPanel>
-    </Grid>
+                    <StackPanel
+                        Grid.Row="2"
+                        Grid.Column="1"
+                        Orientation="Horizontal">
+                        <ui:NumberBox
+                            Width="40"
+                            Style="{StaticResource NumberOnly}"
+                            Value="{Binding DtEndH}" />
+                        <ui:TextBlock Style="{StaticResource Content}" Text=" : " />
+                        <ui:NumberBox
+                            Width="40"
+                            Style="{StaticResource NumberOnly}"
+                            Value="{Binding DtEndM}" />
+                    </StackPanel>
+                    <ui:TextBlock
+                        Grid.Row="4"
+                        Grid.Column="0"
+                        Style="{StaticResource GridTitleLeft}"
+                        Text="간격" />
+
+                    <StackPanel
+                        Grid.Row="4"
+                        Grid.Column="1"
+                        Orientation="Horizontal">
+                        <ui:NumberBox
+                            Width="40"
+                            Style="{StaticResource NumberOnly}"
+                            Value="{Binding DtTermH}" />
+                        <ui:TextBlock Style="{StaticResource Content}" Text=" : " />
+                        <ui:NumberBox
+                            Width="40"
+                            Style="{StaticResource NumberOnly}"
+                            Value="{Binding DtTermM}" />
+                        <ui:TextBlock Style="{StaticResource Content}" Text=" : " />
+                        <ui:NumberBox
+                            Width="40"
+                            Style="{StaticResource NumberOnly}"
+                            Value="{Binding DtTermS}" />
+                    </StackPanel>
+                </Grid>
+
+                <Grid Visibility="{Binding VisibleSchedule}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="150" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <ui:TextBlock
+                        Grid.Column="0"
+                        Style="{StaticResource GridTitleLeft}"
+                        Text="시작 시간" />
+
+                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+
+                        <Border BorderBrush="#ABADB3" BorderThickness="1">
+                            <ui:ListView
+                                Width="80"
+                                Height="113"
+                                ItemsSource="{Binding ListItems}"
+                                SelectedItem="{Binding SelectedListItem, Mode=TwoWay}"
+                                Style="{StaticResource ListView}" />
+                        </Border>
+                        <StackPanel Margin="10,0,0,0" Orientation="Vertical">
+                            <ui:Button
+                                Width="80"
+                                Height="30"
+                                Margin="0,0,0,10"
+                                Content="추가"
+                                Style="{StaticResource BtnFunctionBlue}" />
+                            <ui:Button
+                                Width="80"
+                                Height="30"
+                                Margin="0,0,0,10"
+                                Content="삭제"
+                                Style="{StaticResource BtnFunction}" />
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+            <ui:TextBlock
+                Grid.Row="6"
+                Grid.Column="0"
+                Style="{StaticResource GridTitleLeft}"
+                Text="분사 유지 시간" />
+            <StackPanel
+                Grid.Row="6"
+                Grid.Column="1"
+                Orientation="Horizontal">
+                <ui:NumberBox
+                    Width="40"
+                    Style="{StaticResource NumberOnly}"
+                    Value="{Binding DtTermInterval}" />
+                <ui:TextBlock Style="{StaticResource Content}" Text=" 초" />
+            </StackPanel>
+            <StackPanel
+                Grid.Row="8"
+                Grid.Column="1"
+                Orientation="Horizontal">
+                <ui:Button
+                    Width="80"
+                    Height="30"
+                    Content="동작"
+                    Style="{StaticResource BtnFunctionBlue}" />
+                <ui:Button
+                    Width="80"
+                    Height="30"
+                    Content="중지"
+                    Style="{StaticResource BtnFunction}" />
+            </StackPanel>
+            <StackPanel
+                Grid.Row="10"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                Orientation="Horizontal">
+                <ui:Button
+                    Width="80"
+                    Height="30"
+                    Content="ON"
+                    Style="{StaticResource BtnFunctionBlue}" />
+                <ui:Button
+                    Width="80"
+                    Height="30"
+                    Content="OFF"
+                    Style="{StaticResource BtnFunction}" />
+            </StackPanel>
+        </Grid>
+    </Border>
 </UserControl>
