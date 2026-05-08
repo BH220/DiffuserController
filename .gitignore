@@ -417,3 +417,4 @@ FodyWeavers.xsd
 *.msm
 *.msp
 /DiffuserController/appSetting.prod.json
+/DiffuserControllerNew/appSetting.prod.json
