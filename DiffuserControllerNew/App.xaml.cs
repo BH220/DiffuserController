@@ -3,6 +3,8 @@ using DiffuserControllerNew.Views;
 using IWshRuntimeLibrary;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32.SafeHandles;
+using Hardcodet.Wpf.TaskbarNotification;  
+using System.Windows.Controls; 
 using System.Configuration;
 using System.Data;
 using System.Diagnostics;
@@ -12,6 +14,8 @@ using System.Security.Principal;
 using System.Text;
 using System.Text.Json;
 using System.Windows;
+using System.Printing;
+using Microsoft.Win32;
 
 namespace DiffuserControllerNew
 {
@@ -44,6 +48,9 @@ namespace DiffuserControllerNew
         private const uint FILE_SHARE_WRITE = 0x2;
         private const uint OPEN_EXISTING = 0x3;
         public static string ApiKey { get; private set; } = "";
+        
+        private TaskbarIcon _trayIcon;
+        private MainView _mainView;
 
         public App()
         {
@@ -55,6 +62,9 @@ namespace DiffuserControllerNew
 
         protected override void OnExit(ExitEventArgs e)
         {
+            
+            _trayIcon?.Dispose();
+
             // ServiceProvider가 IDisposable 구현체를 자동 Dispose
             if (Services is IDisposable disposable)
                 disposable.Dispose();
@@ -70,6 +80,7 @@ namespace DiffuserControllerNew
 
             ShowConsoleWindow();
 
+
             // 1. 기본 WPF 어플리케이션 초기화
             base.OnStartup(e);
 
@@ -79,16 +90,93 @@ namespace DiffuserControllerNew
 
             // 2. 어플리케이션 종료 모드 설정
             ShutdownMode = ShutdownMode.OnExplicitShutdown;
-
+#if DEBUG
+#else
             MakeShortCut();
+            AttachRegistry();
+            RegisterTaskScheduler();
+#endif
 
             // API 키 로드
             KeyLoad();
 
-            // MainWindow 설정 및 수동 Show
-            var view = Services.GetRequiredService<MainView>();
-            ShowWindow(view);
+            // ↓ 수정: MainView를 필드에 저장
+            _mainView = Services.GetRequiredService<MainView>();
+            _mainView.Closing += Window_Closing;
+            InitTrayIcon();
+        }
 
+        private void RegisterTaskScheduler()
+        {
+            try
+            {
+                string appPath = Environment.ProcessPath;
+                string taskName = "DiffuserController";
+
+                using (var taskService = new Microsoft.Win32.TaskScheduler.TaskService())
+                {
+                    // 기존 작업 있으면 삭제
+                    taskService.RootFolder.DeleteTask(taskName, false);
+
+                    var task = taskService.NewTask();
+                    task.RegistrationInfo.Description = "Diffuser Controller 자동 시작";
+
+                    // 로그온 시 시작
+                    task.Triggers.Add(new Microsoft.Win32.TaskScheduler.LogonTrigger());
+
+                    // 관리자 권한으로 실행
+                    task.Principal.RunLevel = Microsoft.Win32.TaskScheduler.TaskRunLevel.Highest;
+
+                    task.Actions.Add(new Microsoft.Win32.TaskScheduler.ExecAction(appPath));
+
+                    task.Settings.DisallowStartIfOnBatteries = false;
+                    task.Settings.StopIfGoingOnBatteries = false;
+
+                    taskService.RootFolder.RegisterTaskDefinition(taskName, task);
+                    Console.WriteLine("작업 스케줄러 등록 완료");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"작업 스케줄러 등록 실패: {ex.Message}");
+            }
+        }
+
+        private void AttachRegistry()
+        {
+            try
+            {
+                string appPath = Environment.ProcessPath;
+                string startMenuPath = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.StartMenu),
+                    "Programs");
+                string shortcutPath = Path.Combine(startMenuPath, "디퓨저 제어기.lnk");
+
+                // 이미 있으면 스킵
+                if (System.IO.File.Exists(shortcutPath))
+                    System.IO.File.Delete(shortcutPath);
+
+                // 아이콘 임시 추출
+                string icoPath = Path.Combine(Path.GetTempPath(), "main_ico.ico");
+                using (var stream = Application.GetResourceStream(
+                    new Uri("pack://application:,,,/Resources/main_ico.ico")).Stream)
+                using (var fileStream = new FileStream(icoPath, FileMode.Create))
+                {
+                    stream.CopyTo(fileStream);
+                }
+
+                WshShell shell = new WshShell();
+                IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutPath);
+                shortcut.TargetPath = appPath;
+                shortcut.WorkingDirectory = Path.GetDirectoryName(appPath);
+                shortcut.Description = "Diffuser Controller";
+                shortcut.IconLocation = icoPath;
+                shortcut.Save();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"시작 메뉴 등록 실패: {ex.Message}");
+            }
         }
 
         private static void KeyLoad()
@@ -101,32 +189,56 @@ namespace DiffuserControllerNew
                 App.ApiKey = se.api_key;
             }
         }
-
-
-        private static void ShowWindow(Window window)
+        
+        private void InitTrayIcon()
         {
-            window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            //window.Left = 
-            //window.Top = 
-            //window.Width = 
-            //window.Height = 
-            window.Closed += Window_Closed;
-            window.WindowState = WindowState.Normal;
-            window.Show();
+            _trayIcon = new TaskbarIcon();
+            _trayIcon.Icon = new System.Drawing.Icon(Application.GetResourceStream(new Uri("pack://application:,,,/Resources/main_ico.ico")).Stream);
+            _trayIcon.ToolTipText = $"디퓨저 제어기";
+            _trayIcon.TrayMouseDoubleClick += (s, e) => ShowMainWindow();
+
+            var menu = new ContextMenu();
+
+            var openItem = new MenuItem { Header = "프로그램 열기" };
+            openItem.Click += (s, e) => ShowMainWindow();
+            
+
+            var closeItem = new MenuItem { Header = "프로그램 닫기" };
+            closeItem.Click += (s, e) => ExitApp();
+
+            menu.Items.Add(openItem);
+            menu.Items.Add(new Separator());
+            menu.Items.Add(closeItem);
+            _trayIcon.ContextMenu = menu;
         }
-
-        private static void Window_Closed(object? sender, EventArgs e)
+        
+        private void ExitApp()
         {
-            if (Current != null)
-            {
-                foreach (Window win in Current.Windows)
-                {
-                    if (win != sender as Window)
-                        win.Close();
-                }
-            }
+            _trayIcon?.Dispose();
             Application.Current.Shutdown();
-            Environment.Exit(0); // 혹시 모를 잔여 프로세스를 강제로 종료
+            Environment.Exit(0);
+        }
+        
+        private void ShowMainWindow()
+        {
+            if (!_mainView.IsVisible)
+            {
+                var screenWidth = SystemParameters.WorkArea.Width;
+                var screenHeight = SystemParameters.WorkArea.Height;
+                int detailPoint = 8;
+                _mainView.Left = screenWidth - _mainView.Width + detailPoint;
+                _mainView.Top = screenHeight - _mainView.Height + detailPoint;
+                _mainView.Show();
+            }
+            _mainView.WindowState = WindowState.Normal;
+            _mainView.Activate();
+        }
+  
+        private static void Window_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
+        {
+            e.Cancel = true;
+            if (sender is Window win)
+                win.Hide();
         }
 
 
@@ -134,7 +246,7 @@ namespace DiffuserControllerNew
         private void MakeShortCut()
         {
             string appPath = Environment.ProcessPath;
-            string shortcutName = "System Contoller.lnk"; // 생성할 바로가기 파일 이름
+            string shortcutName = "디퓨저 제어기.lnk"; // 생성할 바로가기 파일 이름
             string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
             string shortcutPath = Path.Combine(desktopPath, shortcutName);
 
@@ -146,14 +258,21 @@ namespace DiffuserControllerNew
 
                 shortcut.TargetPath = appPath;
                 shortcut.WorkingDirectory = Path.GetDirectoryName(appPath);
-                shortcut.Description = "System Contoller";
-                shortcut.IconLocation = appPath; // 필요하다면 아이콘 설정
+                shortcut.Description = "Diffuser Contoller";
+                string icoPath = Path.Combine(Path.GetTempPath(), "main_ico.ico");
+                using (var stream = Application.GetResourceStream(
+                    new Uri("pack://application:,,,/Resources/main_ico.ico")).Stream)
+                using (var fileStream = new FileStream(icoPath, FileMode.Create))
+                {
+                    stream.CopyTo(fileStream);
+                }
+
+                shortcut.IconLocation = icoPath;
 
                 shortcut.Save();
                 byte[] shortcutBytes = System.IO.File.ReadAllBytes(shortcutPath);
                 shortcutBytes[0x15] = (byte)(shortcutBytes[0x15] | 0x20);
                 System.IO.File.WriteAllBytes(shortcutPath, shortcutBytes);
-                //RegistryHelper.AddKey(Microsoft.Win32.RegistryHive.CurrentUser, "", "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers", appPath, "~ RUNASADMIN");
             }
             catch (Exception ex)
             {

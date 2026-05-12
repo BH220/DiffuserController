@@ -12,11 +12,14 @@
     d:Background="White"
     d:DesignWidth="800"
     mc:Ignorable="d">
+    <UserControl.Resources>
+        <cv:HexToColorConverter x:Key="HexToColorConverter" />
+    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="10" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="220" />
@@ -34,12 +37,17 @@
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="10" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
-                    <Viewbox Stretch="Fill">
-                        <Calendar Margin="0,0,0,5" />
-                    </Viewbox>
-                    <Grid Grid.Row="1">
+                    <local:CalendarEx Grid.Row="0" SelectedDate="{Binding SelectedDate, Mode=TwoWay}" />
+                    <Border
+                        Grid.Row="1"
+                        Margin="0,4,0,0"
+                        BorderBrush="#E5E7EB"
+                        BorderThickness="0,1,0,0" />
+
+                    <Grid Grid.Row="2">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="80" />
@@ -56,6 +64,7 @@
                                 <RowDefinition Height="5" />
                             </Grid.RowDefinitions>
                             <ui:TextBlock
+                                x:Name="lbDate"
                                 Grid.Row="1"
                                 Grid.Column="0"
                                 Margin="5,0,5,0"
@@ -68,6 +77,7 @@
                                 VerticalContentAlignment="Center"
                                 IsReadOnly="True"
                                 Style="{StaticResource SelectedDate}"
+                                Text="{Binding TxtSelectedDate, Mode=TwoWay}"
                                 TextAlignment="Center" />
                             <ui:TextBlock
                                 Grid.Row="3"
@@ -75,7 +85,8 @@
                                 Margin="5,0,5,0"
                                 Style="{StaticResource LeftSubTitle}"
                                 Text="내용" />
-                            <ui:TextBox
+                            <TextBox
+                                x:Name="txtContent"
                                 Grid.Row="3"
                                 Grid.RowSpan="2"
                                 Grid.Column="1"
@@ -83,6 +94,7 @@
                                 AcceptsReturn="True"
                                 HorizontalScrollBarVisibility="Disabled"
                                 Style="{StaticResource SelectedContent}"
+                                Text="{Binding TxtContent, Mode=TwoWay}"
                                 TextWrapping="Wrap"
                                 VerticalScrollBarVisibility="Auto" />
                             <Grid Grid.Row="6" Grid.Column="1">
@@ -98,17 +110,20 @@
                                 <ui:Button
                                     Grid.Row="0"
                                     Grid.Column="0"
+                                    Command="{Binding IgnoreDateAddCommand}"
                                     Content="적용"
                                     Style="{StaticResource BtnFunctionBlue}" />
                                 <ui:Button
                                     Grid.Row="0"
                                     Grid.Column="1"
+                                    Command="{Binding IgnoreDateDelCommand}"
                                     Content="삭제"
                                     Style="{StaticResource BtnFunction}" />
                                 <ui:Button
                                     Grid.Row="2"
                                     Grid.Column="0"
                                     Grid.ColumnSpan="2"
+                                    Command="{Binding IgnoreDateAddContinueCommand}"
                                     Content="연속 적용"
                                     Style="{StaticResource BtnFunction}" />
                             </Grid>
@@ -147,17 +162,20 @@
                         Grid.Column="1"
                         Width="60"
                         HorizontalAlignment="Left"
-                        Style="{StaticResource NumberOnly}" />
+                        Style="{StaticResource NumberOnly}"
+                        Value="{Binding TargetYear}" />
                     <ui:Button
                         Grid.Row="3"
                         Grid.Column="1"
                         Height="30"
+                        Command="{Binding SundayLoadCommand}"
                         Content="일요일 반영"
                         Style="{StaticResource BtnFunction}" />
                     <ui:Button
                         Grid.Row="5"
                         Grid.Column="1"
                         Height="30"
+                        Command="{Binding SaturdayLoadCommand}"
                         Content="토요일 반영"
                         Style="{StaticResource BtnFunction}" />
 
@@ -165,21 +183,24 @@
                         Grid.Row="7"
                         Grid.Column="1"
                         Height="30"
+                        Command="{Binding HolidaydayLoadCommand}"
                         Content="공휴일 반영"
                         Style="{StaticResource BtnFunction}" />
                 </Grid>
             </TabItem>
         </TabControl>
-        <StackPanel
-            Grid.Row="2"
-            Grid.Column="2"
-            Orientation="Vertical">
-            <StackPanel Orientation="Horizontal">
+        <Grid Grid.Row="2" Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Row="0" Orientation="Horizontal">
                 <ui:Button
                     Width="110"
                     Height="25"
                     Margin="0,5,0,5"
                     HorizontalAlignment="Left"
+                    Command="{Binding SelectedDelCommand}"
                     Content="선택 항목 삭제"
                     Style="{StaticResource BtnFunction}" />
                 <ui:Button
@@ -187,28 +208,16 @@
                     Height="25"
                     Margin="10,5,0,5"
                     HorizontalAlignment="Left"
+                    Command="{Binding ReLoadCommand}"
                     Content="새로 고침"
                     Style="{StaticResource BtnFunction}" />
             </StackPanel>
             <ui:DataGrid
-                Grid.Row="0"
-                AutoGenerateColumns="False"
-                BorderBrush="#E5E7EB"
-                BorderThickness="1"
-                CanUserAddRows="False"
-                CanUserDeleteRows="False"
-                CanUserResizeColumns="False"
-                CanUserResizeRows="False"
-                CanUserSortColumns="False"
-                ColumnHeaderStyle="{StaticResource DataGridHeader}"
-                GridLinesVisibility="None"
-                IsReadOnly="True"
+                x:Name="grid"
+                Grid.Row="1"
                 ItemsSource="{Binding DateCollection}"
-                RowHeaderWidth="0"
-                RowHeight="32"
-                RowStyle="{StaticResource DataGridRow}"
-                SelectionMode="Single"
-                SelectionUnit="Cell">
+                MouseDoubleClick="Grid_MouseDoubleClick"
+                Style="{StaticResource DataGridIgnoreDate}">
                 <ui:DataGrid.Columns>
                     <DataGridTemplateColumn Width="40">
                         <DataGridTemplateColumn.HeaderTemplate>
@@ -241,31 +250,47 @@
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
                     <DataGridTextColumn
-                        Width="60"
-                        Binding="{Binding name}"
+                        Width="45"
+                        Binding="{Binding Year}"
                         ElementStyle="{StaticResource CellStyle}"
                         Header="년" />
                     <DataGridTextColumn
-                        Width="40"
-                        Binding="{Binding id}"
+                        Width="30"
+                        Binding="{Binding Month}"
                         ElementStyle="{StaticResource CellStyle}"
                         Header="월" />
                     <DataGridTextColumn
-                        Width="40"
-                        Binding="{Binding email}"
+                        Width="30"
+                        Binding="{Binding Day}"
                         ElementStyle="{StaticResource CellStyle}"
                         Header="일" />
+                    <DataGridTemplateColumn Width="40" Header="요일">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Center"
+                                    FontSize="13"
+                                    FontWeight="Bold"
+                                    Foreground="{Binding Color, Converter={StaticResource HexToColorConverter}}"
+                                    Text="{Binding DoW}"
+                                    TextAlignment="Center" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
                     <DataGridTextColumn
                         Width="40"
-                        MaxWidth="100"
+                        Binding="{Binding Color}"
                         ElementStyle="{StaticResource CellStyle}"
-                        Header="요일" />
+                        Header="색"
+                        Visibility="Collapsed" />
                     <DataGridTextColumn
                         Width="*"
-                        ElementStyle="{StaticResource CellStyle}"
+                        Binding="{Binding Data.Message}"
+                        ElementStyle="{StaticResource CellStyleLeft}"
                         Header="내용" />
                 </ui:DataGrid.Columns>
             </ui:DataGrid>
-        </StackPanel>
+        </Grid>
     </Grid>
 </UserControl>

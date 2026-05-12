@@ -9,7 +9,7 @@
     xmlns:vm="clr-namespace:DiffuserControllerNew.ViewModels"
     Title="디퓨저 제어기"
     Width="646"
-    Height="600"
+    Height="610"
     d:DataContext="{d:DesignInstance vm:MainViewModel}"
     Icon="/Resources/main_Icon_512.png"
     ResizeMode="NoResize"
@@ -23,7 +23,7 @@
             <RowDefinition Height="25" />
         </Grid.RowDefinitions>
 
-        <TabControl Grid.Row="0">
+        <TabControl Grid.Row="0" Margin="5">
             <TabItem Header="제어판">
                 <ContentPresenter x:Name="ControlViewHost" />
             </TabItem>
@@ -32,40 +32,45 @@
             </TabItem>
         </TabControl>
 
-        <StatusBar Grid.Row="1">
-            <StatusBar.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <DockPanel LastChildFill="True" />
-                </ItemsPanelTemplate>
-            </StatusBar.ItemsPanel>
-            <StatusBarItem DockPanel.Dock="Right">
-                <TextBlock Margin="0,0,5,0" Text="{Binding StatusbarUserTimeInfo}" />
-            </StatusBarItem>
-            <StatusBarItem>
+        <Border
+            Grid.Row="1"
+            BorderBrush="#E5E7EB"
+            BorderThickness="0,1,0,0">
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
                 <TextBlock
-                    Margin="5,0,0,0"
-                    Text="Session expires in"
-                    Visibility="{Binding StatusbarVisible}" />
-            </StatusBarItem>
-            <StatusBarItem>
+                    Grid.Column="0"
+                    Margin="10,0,0,0"
+                    Style="{StaticResource StatusTxt}"
+                    Text="{Binding LbLeft}" />
                 <TextBlock
-                    Margin="0,0,5,0"
-                    Text="{Binding StatusbarSessionTime}"
-                    Visibility="{Binding StatusbarVisible}" />
-            </StatusBarItem>
-            <StatusBarItem>
-                <Border />
-            </StatusBarItem>
-        </StatusBar>
+                    Grid.Column="1"
+                    Margin="10,0,0,0"
+                    Style="{StaticResource StatusTxt}"
+                    Text="{Binding LbRunning}" />
+                <TextBlock
+                    Grid.Column="3"
+                    Margin="0,0,10,0"
+                    Style="{StaticResource StatusTxt}"
+                    Text="{Binding LbTime}" />
+            </Grid>
+        </Border>
+
         <ui:SnackbarPresenter x:Name="SnackbarPresenter" />
         <!--  오버레이  -->
-        <!--<Grid
+        <Grid
             Grid.RowSpan="2"
             Background="#60000000"
             Visibility="{Binding IsModalOpen, Converter={StaticResource BoolToVisibility}}">
             <Border HorizontalAlignment="Center" VerticalAlignment="Center">
                 <ContentControl Content="{Binding ModalContent}" />
             </Border>
-        </Grid>-->
+        </Grid>
     </Grid>
 </Window>

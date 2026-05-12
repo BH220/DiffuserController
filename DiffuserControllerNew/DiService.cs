@@ -1,4 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
+using DiffuserControllerNew.Factory;
+using DiffuserControllerNew.Interface;
 using DiffuserControllerNew.ViewModels;
 using DiffuserControllerNew.Views;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,7 +28,7 @@ namespace DiffuserControllerNew
             services.AddSingleton<MainViewModelConfiguration>();
 
             // Factories
-            //services.AddSingleton<IUserUpdateViewFactory, UserUpdateViewFactory>();
+            services.AddSingleton<IIgnoreDateAddContinuePopupViewFactory, IgnoreDateAddContinuePopupViewFactory>();
             //services.AddSingleton<ILoginDuplicateViewFactory, LoginDuplicateViewFactory>();
             //services.AddSingleton<ILogDetailViewFactory, LogDetailViewFactory>();
 
@@ -34,11 +36,16 @@ namespace DiffuserControllerNew
             services.AddSingleton<MainViewModel>();
             services.AddSingleton<IgnoreDateViewModel>();
             services.AddSingleton<ControlViewModel>();
+            services.AddTransient<ScheduleAddPopupViewModel>();
+            services.AddTransient<IgnoreDateAddContinuePopupViewModel>();
 
             // ── Views ──
             services.AddSingleton<MainView>();
             services.AddSingleton<IgnoreDateView>();
             services.AddSingleton<ControlView>();
+            services.AddTransient<ScheduleAddPopupView>();
+            services.AddTransient<IgnoreDateAddContinuePopupView>();
+
 
             return services.BuildServiceProvider();
         }

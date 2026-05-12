@@ -2,12 +2,17 @@
     x:Class="DiffuserControllerNew.Views.ControlView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:cm="clr-namespace:DiffuserControllerNew.Common"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:DiffuserControllerNew.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:uc="clr-namespace:DiffuserControllerNew.Converter"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     d:Background="White"
     mc:Ignorable="d">
+    <UserControl.Resources>
+        <uc:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
+    </UserControl.Resources>
     <Border Padding="50,30,50,50">
         <Grid>
             <Grid.RowDefinitions>
@@ -20,7 +25,7 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="20" />
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="50" />
+                <RowDefinition Height="35" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
@@ -40,18 +45,17 @@
                 </Grid.ColumnDefinitions>
                 <ComboBox
                     Grid.Column="0"
-                    Height="32"
-                    Padding="10,6,10,6"
-                    HorizontalAlignment="Stretch"
-                    BorderBrush="#ABADB3"
                     DisplayMemberPath="Display"
                     ItemsSource="{Binding UsbItems}"
-                    SelectedIndex="{Binding UsbSelectedIndex, Mode=TwoWay}" />
+                    SelectedIndex="{Binding UsbSelectedIndex, Mode=TwoWay}"
+                    SelectionChanged="ComboBox_SelectionChanged"
+                    Style="{StaticResource ComboGeneral}" />
                 <ui:Button
                     Grid.Column="1"
                     Width="80"
                     Height="30"
                     Margin="10,0,0,0"
+                    Command="{Binding SearchCommand}"
                     Content="새로고침"
                     Style="{StaticResource BtnFunction}" />
             </Grid>
@@ -68,12 +72,15 @@
                 <RadioButton
                     Margin="0,0,0,0"
                     Content="Interval"
-                    IsChecked="{Binding RbInterval, Mode=TwoWay}"
+                    GroupName="ActionType"
+                    IsChecked="{Binding SelectedActionType, Mode=TwoWay, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static cm:ActionType.Interval}}"
                     Style="{StaticResource RadioButton}" />
+
                 <RadioButton
                     Margin="10,0,0,0"
                     Content="Schedule"
-                    IsChecked="{Binding RbSchedule, Mode=TwoWay}"
+                    GroupName="ActionType"
+                    IsChecked="{Binding SelectedActionType, Mode=TwoWay, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static cm:ActionType.Schedule}}"
                     Style="{StaticResource RadioButton}" />
             </StackPanel>
             <StackPanel
@@ -103,15 +110,17 @@
                         Grid.Row="0"
                         Grid.Column="1"
                         Orientation="Horizontal">
-                        <ui:NumberBox
-                            Width="40"
-                            Style="{StaticResource NumberOnly}"
-                            Value="{Binding DtStartH}" />
+                        <ComboBox
+                            ItemsSource="{Binding DtStartH}"
+                            SelectedItem="{Binding SelectedDtStartH, Mode=TwoWay}"
+                            SelectionChanged="ComboBox_SelectionChanged"
+                            Style="{StaticResource ComboGeneral}" />
                         <ui:TextBlock Style="{StaticResource Content}" Text=" : " />
-                        <ui:NumberBox
-                            Width="40"
-                            Style="{StaticResource NumberOnly}"
-                            Value="{Binding DtStartM}" />
+                        <ComboBox
+                            ItemsSource="{Binding DtStartM}"
+                            SelectedItem="{Binding SelectedDtStartM, Mode=TwoWay}"
+                            SelectionChanged="ComboBox_SelectionChanged"
+                            Style="{StaticResource ComboGeneral}" />
                     </StackPanel>
                     <ui:TextBlock
                         Grid.Row="2"
@@ -123,15 +132,17 @@
                         Grid.Row="2"
                         Grid.Column="1"
                         Orientation="Horizontal">
-                        <ui:NumberBox
-                            Width="40"
-                            Style="{StaticResource NumberOnly}"
-                            Value="{Binding DtEndH}" />
+                        <ComboBox
+                            ItemsSource="{Binding DtEndH}"
+                            SelectedItem="{Binding SelectedDtEndH, Mode=TwoWay}"
+                            SelectionChanged="ComboBox_SelectionChanged"
+                            Style="{StaticResource ComboGeneral}" />
                         <ui:TextBlock Style="{StaticResource Content}" Text=" : " />
-                        <ui:NumberBox
-                            Width="40"
-                            Style="{StaticResource NumberOnly}"
-                            Value="{Binding DtEndM}" />
+                        <ComboBox
+                            ItemsSource="{Binding DtEndM}"
+                            SelectedItem="{Binding SelectedDtEndM, Mode=TwoWay}"
+                            SelectionChanged="ComboBox_SelectionChanged"
+                            Style="{StaticResource ComboGeneral}" />
                     </StackPanel>
                     <ui:TextBlock
                         Grid.Row="4"
@@ -143,20 +154,23 @@
                         Grid.Row="4"
                         Grid.Column="1"
                         Orientation="Horizontal">
-                        <ui:NumberBox
-                            Width="40"
-                            Style="{StaticResource NumberOnly}"
-                            Value="{Binding DtTermH}" />
+                        <ComboBox
+                            ItemsSource="{Binding DtTermH}"
+                            SelectedItem="{Binding SelectedDtTermH, Mode=TwoWay}"
+                            SelectionChanged="ComboBox_SelectionChanged"
+                            Style="{StaticResource ComboGeneral}" />
                         <ui:TextBlock Style="{StaticResource Content}" Text=" : " />
-                        <ui:NumberBox
-                            Width="40"
-                            Style="{StaticResource NumberOnly}"
-                            Value="{Binding DtTermM}" />
+                        <ComboBox
+                            ItemsSource="{Binding DtTermM}"
+                            SelectedItem="{Binding SelectedDtTermM, Mode=TwoWay}"
+                            SelectionChanged="ComboBox_SelectionChanged"
+                            Style="{StaticResource ComboGeneral}" />
                         <ui:TextBlock Style="{StaticResource Content}" Text=" : " />
-                        <ui:NumberBox
-                            Width="40"
-                            Style="{StaticResource NumberOnly}"
-                            Value="{Binding DtTermS}" />
+                        <ComboBox
+                            ItemsSource="{Binding DtTermS}"
+                            SelectedItem="{Binding SelectedDtTermS, Mode=TwoWay}"
+                            SelectionChanged="ComboBox_SelectionChanged"
+                            Style="{StaticResource ComboGeneral}" />
                     </StackPanel>
                 </Grid>
 
@@ -173,7 +187,7 @@
                     <StackPanel Grid.Column="1" Orientation="Horizontal">
 
                         <Border BorderBrush="#ABADB3" BorderThickness="1">
-                            <ui:ListView
+                            <ListView
                                 Width="80"
                                 Height="113"
                                 ItemsSource="{Binding ListItems}"
@@ -185,12 +199,14 @@
                                 Width="80"
                                 Height="30"
                                 Margin="0,0,0,10"
+                                Command="{Binding AddCommand}"
                                 Content="추가"
                                 Style="{StaticResource BtnFunctionBlue}" />
                             <ui:Button
                                 Width="80"
                                 Height="30"
                                 Margin="0,0,0,10"
+                                Command="{Binding DelCommand}"
                                 Content="삭제"
                                 Style="{StaticResource BtnFunction}" />
                         </StackPanel>
@@ -206,10 +222,11 @@
                 Grid.Row="6"
                 Grid.Column="1"
                 Orientation="Horizontal">
-                <ui:NumberBox
-                    Width="40"
-                    Style="{StaticResource NumberOnly}"
-                    Value="{Binding DtTermInterval}" />
+                <ComboBox
+                    ItemsSource="{Binding DtTermInterval}"
+                    SelectedItem="{Binding SelectedDtTermInterval, Mode=TwoWay}"
+                    SelectionChanged="ComboBox_SelectionChanged"
+                    Style="{StaticResource ComboGeneral}" />
                 <ui:TextBlock Style="{StaticResource Content}" Text=" 초" />
             </StackPanel>
             <StackPanel
@@ -219,12 +236,16 @@
                 <ui:Button
                     Width="80"
                     Height="30"
+                    Command="{Binding RunCommand}"
                     Content="동작"
+                    IsEnabled="{Binding BtnRunEnabled}"
                     Style="{StaticResource BtnFunctionBlue}" />
                 <ui:Button
                     Width="80"
                     Height="30"
+                    Command="{Binding StopCommand}"
                     Content="중지"
+                    IsEnabled="{Binding BtnStopEnabled}"
                     Style="{StaticResource BtnFunction}" />
             </StackPanel>
             <StackPanel
@@ -235,12 +256,14 @@
                 <ui:Button
                     Width="80"
                     Height="30"
-                    Content="ON"
+                    Command="{Binding OnCommand}"
+                    Content="강제 ON"
                     Style="{StaticResource BtnFunctionBlue}" />
                 <ui:Button
                     Width="80"
                     Height="30"
-                    Content="OFF"
+                    Command="{Binding OffCommand}"
+                    Content="강제 OFF"
                     Style="{StaticResource BtnFunction}" />
             </StackPanel>
         </Grid>

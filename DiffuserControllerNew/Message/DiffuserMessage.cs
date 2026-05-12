@@ -7,16 +7,9 @@ using System.Threading.Tasks;
 
 namespace DiffuserControllerNew.Message
 {
-    public class ScheduleMessage : IMessageSender
+    public class DiffuserMessage : IMessageSender
     {
         public Sender Sender { get; set; }
         public object Args { get; set; }
-    }
-
-    public class ScheduleMessageData
-    {
-        public DateTime Date { get; set; }
-        public string Message { get; set; }
-        public DateTime EndDate { get; set; }
     }
 }

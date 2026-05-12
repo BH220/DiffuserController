@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DiffuserControllerNew.Views
 {
@@ -26,6 +27,7 @@ namespace DiffuserControllerNew.Views
         {
             InitializeComponent();
             this.DataContext = ignoreDateViewModel;
+            ignoreDateViewModel.ScrollToItemAction = (item) => ScrollToSelectedItem(item);
         }
 
         private void ChkAll_Click(object sender, MouseButtonEventArgs e)
@@ -35,14 +37,7 @@ namespace DiffuserControllerNew.Views
                 bool allSelected = vm.DateCollection.All(u => u.IsSelected);
 
                 foreach (var item in vm.DateCollection)
-                    item.IsSelected = !allSelected;
-
-                //// allSelected 반전 후 이미지 교체
-                //img.Source = new BitmapImage(new Uri(
-                //    !allSelected  // ← 반전된 값으로 체크
-                //        ? "pack://application:,,,/Resources/checked.png"
-                //        : "pack://application:,,,/Resources/unchecked.png",
-                //    UriKind.Absolute));
+                    item.IsSelected = !allSelected; 
                 vm.UpdateSelectRow();
             }
         }
@@ -55,6 +50,31 @@ namespace DiffuserControllerNew.Views
                 if (DataContext is IgnoreDateViewModel vm)
                     vm.UpdateSelectRow();
             }
-        } 
+        }
+
+        public void ScrollToSelectedItem(object item)
+        {
+            if (item == null) return;
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                // 먼저 마지막 아이템으로 스크롤해서 선택 항목이 위로 오게 함
+                var lastItem = grid.Items[grid.Items.Count - 1];
+                grid.ScrollIntoView(lastItem);
+                grid.ScrollIntoView(item);
+            }), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+        }
+
+        private void Grid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (DataContext is not IgnoreDateViewModel vm) return;
+            var hit = e.OriginalSource as FrameworkElement;
+            if (hit?.DataContext is DateDataRow row)
+                vm.OnRowDoubleClick(row);
+        }
+
+        public void MoveCalendarToDate(DateTime date)
+        {
+            //calen.DisplayDate = date;
+        }
     }
 }

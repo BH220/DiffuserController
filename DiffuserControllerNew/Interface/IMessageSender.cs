@@ -24,6 +24,16 @@ namespace DiffuserControllerNew.Interface
         BtnSignOut,
         BtnNotiClose,
         BtnReSignIn,
+        btnSchedulePopupClose,
+        btnScheduleDelete,
+        btnSchedulePopupOpen,
+        btnSchedulePopupAddClose,
+        btnSchedulePopupAddContinue,
+        btnSchedulePopupAddContinueApply,
+        btnDiffuserOn,
+        btnDiffuserOff,
+        BtnRun,
+        BtnStop,
     }
 
     public interface IMessageSender

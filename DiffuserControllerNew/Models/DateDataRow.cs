@@ -36,6 +36,7 @@ namespace DiffuserControllerNew.Models
                     return result;
                 }
         }
+        public string Color => Data.Color;
 
         public DateDataRow(DateModel data)
         {

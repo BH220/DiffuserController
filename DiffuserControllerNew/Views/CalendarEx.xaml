@@ -1,0 +1,1042 @@
+﻿<UserControl
+    x:Class="DiffuserControllerNew.Views.CalendarEx"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:DiffuserControllerNew.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d">
+    <Border
+        Padding="5"
+        HorizontalAlignment="Stretch"
+        VerticalAlignment="Stretch">
+        <Grid>
+            <Grid.Resources>
+                <Style x:Key="StBase" TargetType="TextBlock">
+                    <Setter Property="FontSize" Value="13" />
+                    <Setter Property="TextAlignment" Value="Center" />
+                    <Setter Property="VerticalAlignment" Value="Center" />
+                    <Setter Property="Padding" Value="6" />
+                </Style>
+                <Style
+                    x:Key="StYear"
+                    BasedOn="{StaticResource StBase}"
+                    TargetType="TextBlock">
+                    <Setter Property="FontWeight" Value="Bold" />
+                </Style>
+                <Style
+                    x:Key="StMonth"
+                    BasedOn="{StaticResource StBase}"
+                    TargetType="TextBlock">
+                    <Setter Property="FontWeight" Value="Bold" />
+                </Style>
+                <Style
+                    x:Key="StDow"
+                    BasedOn="{StaticResource StBase}"
+                    TargetType="TextBlock">
+                    <Setter Property="FontWeight" Value="Bold" />
+                </Style>
+                <Style
+                    x:Key="StBtn"
+                    BasedOn="{StaticResource StBase}"
+                    TargetType="TextBlock">
+                    <Setter Property="FontWeight" Value="Bold" />
+                </Style>
+                <Style
+                    x:Key="StDay"
+                    BasedOn="{StaticResource StBase}"
+                    TargetType="TextBlock">
+                    <Setter Property="Foreground" Value="#1F2937" />
+                </Style>
+                <Style
+                    x:Key="StDayAnother"
+                    BasedOn="{StaticResource StBase}"
+                    TargetType="TextBlock">
+                    <Setter Property="Foreground" Value="#6B7280" />
+                </Style>
+                <Style
+                    x:Key="StDayholiday"
+                    BasedOn="{StaticResource StBase}"
+                    TargetType="TextBlock">
+                    <Setter Property="Foreground" Value="#F87171" />
+                </Style>
+                <Style
+                    x:Key="StDaySaturday"
+                    BasedOn="{StaticResource StBase}"
+                    TargetType="TextBlock">
+                    <Setter Property="Foreground" Value="#60A5FA" />
+                </Style>
+
+                <Style
+                    x:Key="StYearBtn"
+                    BasedOn="{StaticResource StBase}"
+                    TargetType="TextBlock">
+                    <Setter Property="Foreground" Value="#60A5FA" />
+                </Style>
+
+                <Style x:Key="StToday" TargetType="Border">
+                    <Setter Property="BorderBrush" Value="#1F2937" />
+                    <Setter Property="BorderThickness" Value="1" />
+                    <Setter Property="CornerRadius" Value="4" />
+                    <Setter Property="HorizontalAlignment" Value="Center" />
+                    <Setter Property="VerticalAlignment" Value="Center" />
+                    <Setter Property="Padding" Value="2" />
+                    <Setter Property="Cursor" Value="Hand" />
+                    <Setter Property="Background" Value="Transparent" />
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="#F3F4F6" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+                <Style x:Key="StBdYearMonth" TargetType="Border">
+                    <Setter Property="CornerRadius" Value="4" />
+                    <Setter Property="HorizontalAlignment" Value="Center" />
+                    <Setter Property="VerticalAlignment" Value="Center" />
+                    <Setter Property="Padding" Value="2" />
+                    <Setter Property="Cursor" Value="Hand" />
+                    <Setter Property="Background" Value="Transparent" />
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="#F3F4F6" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+
+                <Style x:Key="BtnStBdYearMonth" TargetType="Border">
+                    <Setter Property="CornerRadius" Value="4" />
+                    <Setter Property="HorizontalAlignment" Value="Center" />
+                    <Setter Property="VerticalAlignment" Value="Center" />
+                    <Setter Property="Cursor" Value="Hand" />
+                    <Setter Property="Background" Value="Transparent" />
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="#F3F4F6" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+                <Style x:Key="StUpDownBtn" TargetType="Border">
+                    <Setter Property="CornerRadius" Value="4" />
+                    <Setter Property="HorizontalAlignment" Value="Center" />
+                    <Setter Property="VerticalAlignment" Value="Center" />
+
+                    <Setter Property="Padding" Value="4" />
+                    <Setter Property="Cursor" Value="Hand" />
+                    <Setter Property="Background" Value="Transparent" />
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="#F3F4F6" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+                <Style x:Key="BtnStBdDay" TargetType="Border">
+                    <Setter Property="Width" Value="28" />
+                    <Setter Property="Height" Value="28" />
+                    <Setter Property="CornerRadius" Value="14" />
+                    <Setter Property="HorizontalAlignment" Value="Center" />
+                    <Setter Property="VerticalAlignment" Value="Center" />
+                    <Setter Property="Cursor" Value="Hand" />
+                    <Setter Property="Background" Value="Transparent" />
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="#F3F4F6" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+
+                <Style
+                    x:Key="StMonthBtn"
+                    BasedOn="{StaticResource StBase}"
+                    TargetType="TextBlock">
+                    <Setter Property="Foreground" Value="#60A5FA" />
+                </Style>
+            </Grid.Resources>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*" />
+                <RowDefinition Height="7*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Border
+                x:Name="BDY"
+                Grid.Row="0"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                Style="{StaticResource StBdYearMonth}">
+                <TextBlock
+                    x:Name="DY"
+                    MouseLeftButtonDown="Year_MouseLeftButtonDown"
+                    Style="{StaticResource StYear}"
+                    Text="2026년" />
+            </Border>
+            <Border
+                x:Name="BDM"
+                Grid.Row="0"
+                Grid.Column="2"
+                Grid.ColumnSpan="2"
+                HorizontalAlignment="Left"
+                MouseEnter="BDM_MouseEnter"
+                MouseLeave="BDM_MouseLeave"
+                MouseLeftButtonDown="Month_MouseLeftButtonDown"
+                Style="{StaticResource StBdYearMonth}">
+                <TextBlock
+                    x:Name="DM"
+                    Style="{StaticResource StMonth}"
+                    Text="12월"
+                    TextAlignment="Left" />
+            </Border>
+            <Border
+                Grid.Row="0"
+                Grid.Column="4"
+                MouseLeftButtonDown="ToDay_MouseLeftButtonDown"
+                Style="{StaticResource StToday}">
+                <TextBlock
+                    FontSize="11"
+                    Text="오늘"
+                    TextAlignment="Left" />
+            </Border>
+            <Border
+                Grid.Row="0"
+                Grid.Column="5"
+                HorizontalAlignment="Right"
+                MouseLeftButtonDown="Previous_MouseLeftButtonDown"
+                Style="{StaticResource StUpDownBtn}">
+                <TextBlock FontSize="13" Text="▲" />
+            </Border>
+            <Border
+                Grid.Row="0"
+                Grid.Column="6"
+                Margin="1,0,0,0"
+                HorizontalAlignment="Left"
+                MouseLeftButtonDown="Next_MouseLeftButtonDown"
+                Style="{StaticResource StUpDownBtn}">
+                <TextBlock FontSize="13" Text="▼" />
+            </Border>
+            <Border
+                x:Name="PlDay"
+                Grid.Row="1"
+                Grid.Column="0"
+                Grid.ColumnSpan="7"
+                Visibility="Visible">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        Style="{StaticResource StDow}"
+                        Text="일" />
+                    <TextBlock
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        Style="{StaticResource StDow}"
+                        Text="월" />
+                    <TextBlock
+                        Grid.Row="0"
+                        Grid.Column="2"
+                        Style="{StaticResource StDow}"
+                        Text="화" />
+                    <TextBlock
+                        Grid.Row="0"
+                        Grid.Column="3"
+                        Style="{StaticResource StDow}"
+                        Text="수" />
+                    <TextBlock
+                        Grid.Row="0"
+                        Grid.Column="4"
+                        Style="{StaticResource StDow}"
+                        Text="목" />
+                    <TextBlock
+                        Grid.Row="0"
+                        Grid.Column="5"
+                        Style="{StaticResource StDow}"
+                        Text="금" />
+                    <TextBlock
+                        Grid.Row="0"
+                        Grid.Column="6"
+                        Style="{StaticResource StDow}"
+                        Text="토" />
+
+                    <Border
+                        x:Name="BD11"
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        MouseLeftButtonDown="DayBorder_MouseLeftButtonDown"
+                        Style="{StaticResource BtnStBdDay}">
+                        <TextBlock
+                            x:Name="D11"
+                            Style="{StaticResource StDayholiday}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        x:Name="BD12"
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        MouseLeftButtonDown="DayBorder_MouseLeftButtonDown"
+                        Style="{StaticResource BtnStBdDay}">
+                        <TextBlock
+                            x:Name="D12"
+                            Style="{StaticResource StDay}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        x:Name="BD13"
+                        Grid.Row="1"
+                        Grid.Column="2"
+                        MouseLeftButtonDown="DayBorder_MouseLeftButtonDown"
+                        Style="{StaticResource BtnStBdDay}">
+                        <TextBlock
+                            x:Name="D13"
+                            Style="{StaticResource StDay}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        x:Name="BD14"
+                        Grid.Row="1"
+                        Grid.Column="3"
+                        MouseLeftButtonDown="DayBorder_MouseLeftButtonDown"
+                        Style="{StaticResource BtnStBdDay}">
+                        <TextBlock
+                            x:Name="D14"
+                            Style="{StaticResource StDay}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        x:Name="BD15"
+                        Grid.Row="1"
+                        Grid.Column="4"
+                        MouseLeftButtonDown="DayBorder_MouseLeftButtonDown"
+                        Style="{StaticResource BtnStBdDay}">
+                        <TextBlock
+                            x:Name="D15"
+                            Style="{StaticResource StDay}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        x:Name="BD16"
+                        Grid.Row="1"
+                        Grid.Column="5"
+                        MouseLeftButtonDown="DayBorder_MouseLeftButtonDown"
+                        Style="{StaticResource BtnStBdDay}">
+                        <TextBlock
+                            x:Name="D16"
+                            Style="{StaticResource StDay}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        x:Name="BD17"
+                        Grid.Row="1"
+                        Grid.Column="6"
+                        MouseLeftButtonDown="DayBorder_MouseLeftButtonDown"
+                        Style="{StaticResource BtnStBdDay}">
+                        <TextBlock
+                            x:Name="D17"
+                            Style="{StaticResource StDaySaturday}"
+                            Text="" />
+                    </Border>
+
+                    <Border
+                        x:Name="BD21"
+                        Grid.Row="2"
+                        Grid.Column="0"
+                        MouseLeftButtonDown="DayBorder_MouseLeftButtonDown"
+                        Style="{StaticResource BtnStBdDay}">
+                        <TextBlock
+                            x:Name="D21"
+                            Style="{StaticResource StDayholiday}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        x:Name="BD22"
+                        Grid.Row="2"
+                        Grid.Column="1"
+                        MouseLeftButtonDown="DayBorder_MouseLeftButtonDown"
+                        Style="{StaticResource BtnStBdDay}">
+                        <TextBlock
+                            x:Name="D22"
+                            Style="{StaticResource StDay}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        x:Name="BD23"
+                        Grid.Row="2"
+                        Grid.Column="2"
+                        MouseLeftButtonDown="DayBorder_MouseLeftButtonDown"
+                        Style="{StaticResource BtnStBdDay}">
+                        <TextBlock
+                            x:Name="D23"
+                            Style="{StaticResource StDay}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        x:Name="BD24"
+                        Grid.Row="2"
+                        Grid.Column="3"
+                        MouseLeftButtonDown="DayBorder_MouseLeftButtonDown"
+                        Style="{StaticResource BtnStBdDay}">
+                        <TextBlock
+                            x:Name="D24"
+                            Style="{StaticResource StDay}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        x:Name="BD25"
+                        Grid.Row="2"
+                        Grid.Column="4"
+                        MouseLeftButtonDown="DayBorder_MouseLeftButtonDown"
+                        Style="{StaticResource BtnStBdDay}">
+                        <TextBlock
+                            x:Name="D25"
+                            Style="{StaticResource StDay}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        x:Name="BD26"
+                        Grid.Row="2"
+                        Grid.Column="5"
+                        MouseLeftButtonDown="DayBorder_MouseLeftButtonDown"
+                        Style="{StaticResource BtnStBdDay}">
+                        <TextBlock
+                            x:Name="D26"
+                            Style="{StaticResource StDay}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        x:Name="BD27"
+                        Grid.Row="2"
+                        Grid.Column="6"
+                        MouseLeftButtonDown="DayBorder_MouseLeftButtonDown"
+                        Style="{StaticResource BtnStBdDay}">
+                        <TextBlock
+                            x:Name="D27"
+                            Style="{StaticResource StDaySaturday}"
+                            Text="" />
+                    </Border>
+
+                    <Border
+                        x:Name="BD31"
+                        Grid.Row="3"
+                        Grid.Column="0"
+                        MouseLeftButtonDown="DayBorder_MouseLeftButtonDown"
+                        Style="{StaticResource BtnStBdDay}">
+                        <TextBlock
+                            x:Name="D31"
+                            Style="{StaticResource StDayholiday}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        x:Name="BD32"
+                        Grid.Row="3"
+                        Grid.Column="1"
+                        MouseLeftButtonDown="DayBorder_MouseLeftButtonDown"
+                        Style="{StaticResource BtnStBdDay}">
+                        <TextBlock
+                            x:Name="D32"
+                            Style="{StaticResource StDay}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        x:Name="BD33"
+                        Grid.Row="3"
+                        Grid.Column="2"
+                        MouseLeftButtonDown="DayBorder_MouseLeftButtonDown"
+                        Style="{StaticResource BtnStBdDay}">
+                        <TextBlock
+                            x:Name="D33"
+                            Style="{StaticResource StDay}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        x:Name="BD34"
+                        Grid.Row="3"
+                        Grid.Column="3"
+                        MouseLeftButtonDown="DayBorder_MouseLeftButtonDown"
+                        Style="{StaticResource BtnStBdDay}">
+                        <TextBlock
+                            x:Name="D34"
+                            Style="{StaticResource StDay}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        x:Name="BD35"
+                        Grid.Row="3"
+                        Grid.Column="4"
+                        MouseLeftButtonDown="DayBorder_MouseLeftButtonDown"
+                        Style="{StaticResource BtnStBdDay}">
+                        <TextBlock
+                            x:Name="D35"
+                            Style="{StaticResource StDay}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        x:Name="BD36"
+                        Grid.Row="3"
+                        Grid.Column="5"
+                        MouseLeftButtonDown="DayBorder_MouseLeftButtonDown"
+                        Style="{StaticResource BtnStBdDay}">
+                        <TextBlock
+                            x:Name="D36"
+                            Style="{StaticResource StDay}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        x:Name="BD37"
+                        Grid.Row="3"
+                        Grid.Column="6"
+                        MouseLeftButtonDown="DayBorder_MouseLeftButtonDown"
+                        Style="{StaticResource BtnStBdDay}">
+                        <TextBlock
+                            x:Name="D37"
+                            Style="{StaticResource StDaySaturday}"
+                            Text="" />
+                    </Border>
+
+                    <Border
+                        x:Name="BD41"
+                        Grid.Row="4"
+                        Grid.Column="0"
+                        MouseLeftButtonDown="DayBorder_MouseLeftButtonDown"
+                        Style="{StaticResource BtnStBdDay}">
+                        <TextBlock
+                            x:Name="D41"
+                            Style="{StaticResource StDayholiday}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        x:Name="BD42"
+                        Grid.Row="4"
+                        Grid.Column="1"
+                        MouseLeftButtonDown="DayBorder_MouseLeftButtonDown"
+                        Style="{StaticResource BtnStBdDay}">
+                        <TextBlock
+                            x:Name="D42"
+                            Style="{StaticResource StDay}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        x:Name="BD43"
+                        Grid.Row="4"
+                        Grid.Column="2"
+                        MouseLeftButtonDown="DayBorder_MouseLeftButtonDown"
+                        Style="{StaticResource BtnStBdDay}">
+                        <TextBlock
+                            x:Name="D43"
+                            Style="{StaticResource StDay}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        x:Name="BD44"
+                        Grid.Row="4"
+                        Grid.Column="3"
+                        MouseLeftButtonDown="DayBorder_MouseLeftButtonDown"
+                        Style="{StaticResource BtnStBdDay}">
+                        <TextBlock
+                            x:Name="D44"
+                            Style="{StaticResource StDay}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        x:Name="BD45"
+                        Grid.Row="4"
+                        Grid.Column="4"
+                        MouseLeftButtonDown="DayBorder_MouseLeftButtonDown"
+                        Style="{StaticResource BtnStBdDay}">
+                        <TextBlock
+                            x:Name="D45"
+                            Style="{StaticResource StDay}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        x:Name="BD46"
+                        Grid.Row="4"
+                        Grid.Column="5"
+                        MouseLeftButtonDown="DayBorder_MouseLeftButtonDown"
+                        Style="{StaticResource BtnStBdDay}">
+                        <TextBlock
+                            x:Name="D46"
+                            Style="{StaticResource StDay}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        x:Name="BD47"
+                        Grid.Row="4"
+                        Grid.Column="6"
+                        MouseLeftButtonDown="DayBorder_MouseLeftButtonDown"
+                        Style="{StaticResource BtnStBdDay}">
+                        <TextBlock
+                            x:Name="D47"
+                            Style="{StaticResource StDaySaturday}"
+                            Text="" />
+                    </Border>
+
+                    <Border
+                        x:Name="BD51"
+                        Grid.Row="5"
+                        Grid.Column="0"
+                        MouseLeftButtonDown="DayBorder_MouseLeftButtonDown"
+                        Style="{StaticResource BtnStBdDay}">
+                        <TextBlock
+                            x:Name="D51"
+                            Style="{StaticResource StDayholiday}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        x:Name="BD52"
+                        Grid.Row="5"
+                        Grid.Column="1"
+                        MouseLeftButtonDown="DayBorder_MouseLeftButtonDown"
+                        Style="{StaticResource BtnStBdDay}">
+                        <TextBlock
+                            x:Name="D52"
+                            Style="{StaticResource StDay}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        x:Name="BD53"
+                        Grid.Row="5"
+                        Grid.Column="2"
+                        MouseLeftButtonDown="DayBorder_MouseLeftButtonDown"
+                        Style="{StaticResource BtnStBdDay}">
+                        <TextBlock
+                            x:Name="D53"
+                            Style="{StaticResource StDay}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        x:Name="BD54"
+                        Grid.Row="5"
+                        Grid.Column="3"
+                        MouseLeftButtonDown="DayBorder_MouseLeftButtonDown"
+                        Style="{StaticResource BtnStBdDay}">
+                        <TextBlock
+                            x:Name="D54"
+                            Style="{StaticResource StDay}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        x:Name="BD55"
+                        Grid.Row="5"
+                        Grid.Column="4"
+                        MouseLeftButtonDown="DayBorder_MouseLeftButtonDown"
+                        Style="{StaticResource BtnStBdDay}">
+                        <TextBlock
+                            x:Name="D55"
+                            Style="{StaticResource StDay}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        x:Name="BD56"
+                        Grid.Row="5"
+                        Grid.Column="5"
+                        MouseLeftButtonDown="DayBorder_MouseLeftButtonDown"
+                        Style="{StaticResource BtnStBdDay}">
+                        <TextBlock
+                            x:Name="D56"
+                            Style="{StaticResource StDay}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        x:Name="BD57"
+                        Grid.Row="5"
+                        Grid.Column="6"
+                        MouseLeftButtonDown="DayBorder_MouseLeftButtonDown"
+                        Style="{StaticResource BtnStBdDay}">
+                        <TextBlock
+                            x:Name="D57"
+                            Style="{StaticResource StDaySaturday}"
+                            Text="" />
+                    </Border>
+
+                    <Border
+                        x:Name="BD61"
+                        Grid.Row="6"
+                        Grid.Column="0"
+                        MouseLeftButtonDown="DayBorder_MouseLeftButtonDown"
+                        Style="{StaticResource BtnStBdDay}">
+                        <TextBlock
+                            x:Name="D61"
+                            Style="{StaticResource StDayholiday}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        x:Name="BD62"
+                        Grid.Row="6"
+                        Grid.Column="1"
+                        MouseLeftButtonDown="DayBorder_MouseLeftButtonDown"
+                        Style="{StaticResource BtnStBdDay}">
+                        <TextBlock
+                            x:Name="D62"
+                            Style="{StaticResource StDay}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        x:Name="BD63"
+                        Grid.Row="6"
+                        Grid.Column="2"
+                        MouseLeftButtonDown="DayBorder_MouseLeftButtonDown"
+                        Style="{StaticResource BtnStBdDay}">
+                        <TextBlock
+                            x:Name="D63"
+                            Style="{StaticResource StDay}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        x:Name="BD64"
+                        Grid.Row="6"
+                        Grid.Column="3"
+                        MouseLeftButtonDown="DayBorder_MouseLeftButtonDown"
+                        Style="{StaticResource BtnStBdDay}">
+                        <TextBlock
+                            x:Name="D64"
+                            Style="{StaticResource StDay}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        x:Name="BD65"
+                        Grid.Row="6"
+                        Grid.Column="4"
+                        MouseLeftButtonDown="DayBorder_MouseLeftButtonDown"
+                        Style="{StaticResource BtnStBdDay}">
+                        <TextBlock
+                            x:Name="D65"
+                            Style="{StaticResource StDay}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        x:Name="BD66"
+                        Grid.Row="6"
+                        Grid.Column="5"
+                        MouseLeftButtonDown="DayBorder_MouseLeftButtonDown"
+                        Style="{StaticResource BtnStBdDay}">
+                        <TextBlock
+                            x:Name="D66"
+                            Style="{StaticResource StDay}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        x:Name="BD67"
+                        Grid.Row="6"
+                        Grid.Column="6"
+                        MouseLeftButtonDown="DayBorder_MouseLeftButtonDown"
+                        Style="{StaticResource BtnStBdDay}">
+                        <TextBlock
+                            x:Name="D67"
+                            Style="{StaticResource StDaySaturday}"
+                            Text="" />
+                    </Border>
+                </Grid>
+            </Border>
+            <Border
+                x:Name="PlYear"
+                Grid.Row="1"
+                Grid.Column="0"
+                Grid.ColumnSpan="7"
+                Visibility="Collapsed">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="10*" />
+                        <RowDefinition Height="20*" />
+                        <RowDefinition Height="20*" />
+                        <RowDefinition Height="20*" />
+                        <RowDefinition Height="20*" />
+                        <RowDefinition Height="10*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Style="{StaticResource BtnStBdYearMonth}">
+                        <TextBlock
+                            x:Name="Y01"
+                            MouseLeftButtonDown="YearDetail_MouseLeftButtonDown"
+                            Style="{StaticResource StYearBtn}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        Style="{StaticResource BtnStBdYearMonth}">
+                        <TextBlock
+                            x:Name="Y02"
+                            MouseLeftButtonDown="YearDetail_MouseLeftButtonDown"
+                            Style="{StaticResource StYearBtn}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        Grid.Row="1"
+                        Grid.Column="2"
+                        Style="{StaticResource BtnStBdYearMonth}">
+                        <TextBlock
+                            x:Name="Y03"
+                            MouseLeftButtonDown="YearDetail_MouseLeftButtonDown"
+                            Style="{StaticResource StYearBtn}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        Grid.Row="2"
+                        Grid.Column="0"
+                        Style="{StaticResource BtnStBdYearMonth}">
+                        <TextBlock
+                            x:Name="Y04"
+                            MouseLeftButtonDown="YearDetail_MouseLeftButtonDown"
+                            Style="{StaticResource StYearBtn}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        Grid.Row="2"
+                        Grid.Column="1"
+                        Style="{StaticResource BtnStBdYearMonth}">
+                        <TextBlock
+                            x:Name="Y05"
+                            MouseLeftButtonDown="YearDetail_MouseLeftButtonDown"
+                            Style="{StaticResource StYearBtn}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        Grid.Row="2"
+                        Grid.Column="2"
+                        Style="{StaticResource BtnStBdYearMonth}">
+                        <TextBlock
+                            x:Name="Y06"
+                            MouseLeftButtonDown="YearDetail_MouseLeftButtonDown"
+                            Style="{StaticResource StYearBtn}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        Grid.Row="3"
+                        Grid.Column="0"
+                        Style="{StaticResource BtnStBdYearMonth}">
+                        <TextBlock
+                            x:Name="Y07"
+                            MouseLeftButtonDown="YearDetail_MouseLeftButtonDown"
+                            Style="{StaticResource StYearBtn}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        Grid.Row="3"
+                        Grid.Column="1"
+                        Style="{StaticResource BtnStBdYearMonth}">
+                        <TextBlock
+                            x:Name="Y08"
+                            MouseLeftButtonDown="YearDetail_MouseLeftButtonDown"
+                            Style="{StaticResource StYearBtn}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        Grid.Row="3"
+                        Grid.Column="2"
+                        Style="{StaticResource BtnStBdYearMonth}">
+                        <TextBlock
+                            x:Name="Y09"
+                            MouseLeftButtonDown="YearDetail_MouseLeftButtonDown"
+                            Style="{StaticResource StYearBtn}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        Grid.Row="4"
+                        Grid.Column="0"
+                        Style="{StaticResource BtnStBdYearMonth}">
+                        <TextBlock
+                            x:Name="Y10"
+                            MouseLeftButtonDown="YearDetail_MouseLeftButtonDown"
+                            Style="{StaticResource StYearBtn}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        Grid.Row="4"
+                        Grid.Column="1"
+                        Style="{StaticResource BtnStBdYearMonth}">
+                        <TextBlock
+                            x:Name="Y11"
+                            MouseLeftButtonDown="YearDetail_MouseLeftButtonDown"
+                            Style="{StaticResource StYearBtn}"
+                            Text="" />
+                    </Border>
+                    <Border
+                        Grid.Row="4"
+                        Grid.Column="2"
+                        Style="{StaticResource BtnStBdYearMonth}">
+                        <TextBlock
+                            x:Name="Y12"
+                            MouseLeftButtonDown="YearDetail_MouseLeftButtonDown"
+                            Style="{StaticResource StYearBtn}"
+                            Text="" />
+                    </Border>
+                </Grid>
+            </Border>
+            <Border
+                x:Name="PlMonth"
+                Grid.Row="1"
+                Grid.Column="0"
+                Grid.ColumnSpan="7"
+                Visibility="Collapsed">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="10*" />
+                        <RowDefinition Height="20*" />
+                        <RowDefinition Height="20*" />
+                        <RowDefinition Height="20*" />
+                        <RowDefinition Height="20*" />
+                        <RowDefinition Height="10*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Style="{StaticResource BtnStBdYearMonth}">
+                        <TextBlock
+                            x:Name="M01"
+                            MouseLeftButtonDown="MonthDetail_MouseLeftButtonDown"
+                            Style="{StaticResource StMonthBtn}"
+                            Text="1월" />
+                    </Border>
+                    <Border
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        Style="{StaticResource BtnStBdYearMonth}">
+                        <TextBlock
+                            x:Name="M02"
+                            MouseLeftButtonDown="MonthDetail_MouseLeftButtonDown"
+                            Style="{StaticResource StMonthBtn}"
+                            Text="2월" />
+                    </Border>
+                    <Border
+                        Grid.Row="1"
+                        Grid.Column="2"
+                        Style="{StaticResource BtnStBdYearMonth}">
+                        <TextBlock
+                            x:Name="M03"
+                            MouseLeftButtonDown="MonthDetail_MouseLeftButtonDown"
+                            Style="{StaticResource StMonthBtn}"
+                            Text="3월" />
+                    </Border>
+                    <Border
+                        Grid.Row="2"
+                        Grid.Column="0"
+                        Style="{StaticResource BtnStBdYearMonth}">
+                        <TextBlock
+                            x:Name="M04"
+                            MouseLeftButtonDown="MonthDetail_MouseLeftButtonDown"
+                            Style="{StaticResource StMonthBtn}"
+                            Text="4월" />
+                    </Border>
+                    <Border
+                        Grid.Row="2"
+                        Grid.Column="1"
+                        Style="{StaticResource BtnStBdYearMonth}">
+                        <TextBlock
+                            x:Name="M05"
+                            MouseLeftButtonDown="MonthDetail_MouseLeftButtonDown"
+                            Style="{StaticResource StMonthBtn}"
+                            Text="5월" />
+                    </Border>
+                    <Border
+                        Grid.Row="2"
+                        Grid.Column="2"
+                        Style="{StaticResource BtnStBdYearMonth}">
+                        <TextBlock
+                            x:Name="M06"
+                            MouseLeftButtonDown="MonthDetail_MouseLeftButtonDown"
+                            Style="{StaticResource StMonthBtn}"
+                            Text="6월" />
+                    </Border>
+                    <Border
+                        Grid.Row="3"
+                        Grid.Column="0"
+                        Style="{StaticResource BtnStBdYearMonth}">
+                        <TextBlock
+                            x:Name="M07"
+                            MouseLeftButtonDown="MonthDetail_MouseLeftButtonDown"
+                            Style="{StaticResource StMonthBtn}"
+                            Text="7월" />
+                    </Border>
+                    <Border
+                        Grid.Row="3"
+                        Grid.Column="1"
+                        Style="{StaticResource BtnStBdYearMonth}">
+                        <TextBlock
+                            x:Name="M08"
+                            MouseLeftButtonDown="MonthDetail_MouseLeftButtonDown"
+                            Style="{StaticResource StMonthBtn}"
+                            Text="8월" />
+                    </Border>
+                    <Border
+                        Grid.Row="3"
+                        Grid.Column="2"
+                        Style="{StaticResource BtnStBdYearMonth}">
+                        <TextBlock
+                            x:Name="M09"
+                            MouseLeftButtonDown="MonthDetail_MouseLeftButtonDown"
+                            Style="{StaticResource StMonthBtn}"
+                            Text="9월" />
+                    </Border>
+                    <Border
+                        Grid.Row="4"
+                        Grid.Column="0"
+                        Style="{StaticResource BtnStBdYearMonth}">
+                        <TextBlock
+                            x:Name="M10"
+                            MouseLeftButtonDown="MonthDetail_MouseLeftButtonDown"
+                            Style="{StaticResource StMonthBtn}"
+                            Text="10월" />
+                    </Border>
+                    <Border
+                        Grid.Row="4"
+                        Grid.Column="1"
+                        Style="{StaticResource BtnStBdYearMonth}">
+                        <TextBlock
+                            x:Name="M11"
+                            MouseLeftButtonDown="MonthDetail_MouseLeftButtonDown"
+                            Style="{StaticResource StMonthBtn}"
+                            Text="11월" />
+                    </Border>
+                    <Border
+                        Grid.Row="4"
+                        Grid.Column="2"
+                        Style="{StaticResource BtnStBdYearMonth}">
+                        <TextBlock
+                            x:Name="M12"
+                            MouseLeftButtonDown="MonthDetail_MouseLeftButtonDown"
+                            Style="{StaticResource StMonthBtn}"
+                            Text="12월" />
+                    </Border>
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
+</UserControl>

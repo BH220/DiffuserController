@@ -17,23 +17,14 @@ using System.Windows.Shapes;
 namespace DiffuserControllerNew.Views
 {
     /// <summary>
-    /// ControlView.xaml에 대한 상호 작용 논리
+    /// ScheduleAddPopupView.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class ControlView : UserControl
+    public partial class ScheduleAddPopupView : UserControl
     {
-        public ControlView(ControlViewModel controlViewModel)
+        public ScheduleAddPopupView(ScheduleAddPopupViewModel scheduleAddPopupViewModel)
         {
             InitializeComponent();
-            this.DataContext = controlViewModel;
-        }
-
-        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            ControlViewModel controlViewModel = this.DataContext as ControlViewModel;
-            if(controlViewModel != null)
-            {
-                controlViewModel.SaveSettings();
-            }
+            this.DataContext = scheduleAddPopupViewModel;
         }
     }
 }

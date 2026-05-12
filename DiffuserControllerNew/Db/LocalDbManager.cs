@@ -18,8 +18,8 @@ namespace DiffuserControllerNew.Db
         public BindingList<DateModel> Dates { get; set; }
         [JsonProperty]
         public ControlModel ControlModel { get; set; }
-
-        public List<ComPortItem> Ports { get; set; }
+        [JsonProperty]
+        public ComPortItem SelectedComPort { get; set; }
 
         private string Dic = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "BH Soft", "Diffuser Controller");
         private string JsonPath
@@ -46,6 +46,11 @@ namespace DiffuserControllerNew.Db
             }
         }
 
+        public void Refresh()
+        {
+            Init();
+        }
+
 
         private void Init()
         {
@@ -55,11 +60,13 @@ namespace DiffuserControllerNew.Db
                 var a  = JsonConvert.DeserializeObject<LocalDbManager>(json);
                 Dates = a.Dates;
                 ControlModel = a.ControlModel;
+                SelectedComPort = a.SelectedComPort;
             }
             else
             {
                 Dates = new BindingList<DateModel>();
                 ControlModel = new ControlModel();
+                SelectedComPort = new ComPortItem();
                 Save();
             }
         }

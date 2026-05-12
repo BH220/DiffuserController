@@ -1,0 +1,105 @@
+﻿<UserControl
+    x:Class="DiffuserControllerNew.Views.ScheduleAddPopupView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:DiffuserControllerNew.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    d:Background="White"
+    mc:Ignorable="d">
+    <Border
+        Width="Auto"
+        Background="White"
+        BorderBrush="#404040"
+        BorderThickness="1"
+        CornerRadius="7">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="31" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Border
+                Grid.Row="0"
+                Background="#F3F3F3"
+                BorderBrush="#404040"
+                BorderThickness="0,0,0,1"
+                CornerRadius="7 7 0 0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="70" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock
+                        Grid.Column="0"
+                        Padding="10"
+                        VerticalAlignment="Center"
+                        Text="스케줄링 시간 추가" />
+                    <ui:Button
+                        Grid.Column="1"
+                        Command="{Binding PopupHeaderCloseCommand}"
+                        Content="X"
+                        Style="{StaticResource BtnPopupHeaderClose}" />
+                </Grid>
+            </Border>
+            <Border Grid.Row="1" Padding="10">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        Padding="10"
+                        VerticalAlignment="Center"
+                        Text="시간 입력" />
+
+
+                    <StackPanel
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        Orientation="Horizontal">
+                        <ComboBox
+                            ItemsSource="{Binding DtStartH}"
+                            SelectedItem="{Binding SelectedDtStartH, Mode=TwoWay}"
+                            Style="{StaticResource ComboGeneral}" />
+                        <ui:TextBlock Style="{StaticResource Content}" Text=" : " />
+                        <ComboBox
+                            ItemsSource="{Binding DtStartM}"
+                            SelectedItem="{Binding SelectedDtStartM, Mode=TwoWay}"
+                            Style="{StaticResource ComboGeneral}" />
+                    </StackPanel>
+                    <StackPanel
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Grid.ColumnSpan="2"
+                        Margin="0,6,0,0"
+                        HorizontalAlignment="Center"
+                        Orientation="Horizontal">
+                        <ui:Button
+                            Width="100"
+                            Height="35"
+                            Margin="0,0,3,0"
+                            Command="{Binding AddContinueCommand}"
+                            Content="추가 후 계속"
+                            Style="{StaticResource BtnFunction}" />
+                        <ui:Button
+                            Width="100"
+                            Height="35"
+                            Margin="3,0,0,0"
+                            Command="{Binding AddCommand}"
+                            Content="추가 후 닫기"
+                            Style="{StaticResource BtnFunction}" />
+                    </StackPanel>
+                </Grid>
+
+            </Border>
+
+        </Grid>
+    </Border>
+</UserControl>
