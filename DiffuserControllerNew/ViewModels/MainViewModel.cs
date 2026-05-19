@@ -52,7 +52,6 @@ namespace DiffuserControllerNew.ViewModels
         private SerialPort? _port;
 
         private DispatcherTimer _timer;
-        private DispatcherTimer _runningTimer;
         private DateTime sessionTimeLeft;
         private readonly DateTime sessionDefDate = new DateTime(2000, 1, 1, 0, 0, 0);
 
@@ -84,11 +83,6 @@ namespace DiffuserControllerNew.ViewModels
             _timer.Tick += OnTimerTick;
             _timer.Start();
 
-            _runningTimer = new DispatcherTimer()
-            {
-                Interval = TimeSpan.FromSeconds(1)
-            };
-            _runningTimer.Tick += _runningTimer_Tick;
         }
 
 
@@ -119,8 +113,6 @@ namespace DiffuserControllerNew.ViewModels
                         else
                         {
                             runningSec = LocalDbManager.Instance.ControlModel.MaintainSecond;
-                            _runningTimer.IsEnabled = true;
-                            _runningTimer.Start();
                             DiffuserExecute(true);
                         }
                     }
@@ -140,7 +132,7 @@ namespace DiffuserControllerNew.ViewModels
             }
         }
 
-        private void DiffuserExecute(bool v)
+        private async void DiffuserExecute(bool v)
         {
             if (v)
             {
@@ -152,29 +144,15 @@ namespace DiffuserControllerNew.ViewModels
                     _port.Open();
                     _port?.Write(new byte[] { 0xA0, 0x01, 0x01, 0xA2 }, 0, 4);
                 }
+                await Task.Delay(300);
+                DiffuserExecute(false);
             }
             else
             {
                 _port?.Write(new byte[] { 0xA0, 0x01, 0x00, 0xA1 }, 0, 4);
             }
         }
-
-        private void _runningTimer_Tick(object? sender, EventArgs e)
-        {
-            if (runningSec == 0)
-            {
-                LbRunning = "";
-                _runningTimer.Stop();
-                _runningTimer.IsEnabled = false;
-                DiffuserExecute(false);
-            }
-            else
-            {
-                LbRunning = $" ( 분사 중... 남은 시간: {runningSec}초 )";
-                runningSec--;
-            }
-        }
-
+                
         private void SettingTargetDatetime()
         {
             lstTargetDatetime = new List<DateTime>();
